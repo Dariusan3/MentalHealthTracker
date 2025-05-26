@@ -1,0 +1,168 @@
+﻿@page "/"
+@using MudBlazor
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+<PageTitle>Mental Health Tracker - Acasă</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+            <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true" Class="mt-4 mb-2">Bine ai venit, @context.User.Identity?.Name!</MudText>
+            <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="mb-8">Îți mulțumim că folosești Mental Health Tracker</MudText>
+
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <MudCard Elevation="3" Class="rounded-lg">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h5">Jurnal zilnic</MudText>
+                            </CardHeaderContent>
+                            <CardHeaderActions>
+                                <MudIcon Icon="@Icons.Material.Filled.Book" Color="Color.Primary" />
+                            </CardHeaderActions>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudText>Înregistrează-ți starea de spirit și gândurile zilnice pentru a urmări evoluția sănătății tale mentale.</MudText>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="jurnal" EndIcon="@Icons.Material.Filled.ArrowForward">Adaugă o înregistrare</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudCard Elevation="3" Class="rounded-lg">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h5">Statistici</MudText>
+                            </CardHeaderContent>
+                            <CardHeaderActions>
+                                <MudIcon Icon="@Icons.Material.Filled.BarChart" Color="Color.Secondary" />
+                            </CardHeaderActions>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudText>Vizualizează evoluția stării tale de spirit și identifică tendințele în timp.</MudText>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Variant="Variant.Filled" Color="Color.Secondary" Href="statistici" EndIcon="@Icons.Material.Filled.ArrowForward">Vezi statistici</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+                <MudItem xs="12" sm="6" Class="mt-4">
+                    <MudCard Elevation="3" Class="rounded-lg">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h5">Resurse</MudText>
+                            </CardHeaderContent>
+                            <CardHeaderActions>
+                                <MudIcon Icon="@Icons.Material.Filled.LibraryBooks" Color="Color.Info" />
+                            </CardHeaderActions>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudText>Descoperă articole, exerciții și sfaturi pentru îmbunătățirea sănătății tale mentale.</MudText>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Variant="Variant.Filled" Color="Color.Info" Href="resurse" EndIcon="@Icons.Material.Filled.ArrowForward">Explorează resurse</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+                <MudItem xs="12" sm="6" Class="mt-4">
+                    <MudCard Elevation="3" Class="rounded-lg">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h5">Profil</MudText>
+                            </CardHeaderContent>
+                            <CardHeaderActions>
+                                <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Tertiary" />
+                            </CardHeaderActions>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudText>Gestionează-ți profilul și preferințele personale.</MudText>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Variant="Variant.Filled" Color="Color.Tertiary" Href="profil" EndIcon="@Icons.Material.Filled.ArrowForward">Accesează profilul</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </MudContainer>
+    </Authorized>
+    <NotAuthorized>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+            <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true" Class="mt-4 mb-8">Bine ați venit la Mental Health Tracker</MudText>
+            
+            <MudPaper Elevation="3" Class="pa-6 mx-auto my-4" Style="max-width: 800px;">
+                <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-4">Monitorizează și îmbunătățește sănătatea ta mentală</MudText>
+                <MudText Align="Align.Center" Class="mb-4">
+                    Mental Health Tracker este o aplicație care te ajută să îți monitorizezi starea de spirit, să identifici factorii care îți influențează sănătatea mentală și să dezvolți obiceiuri sănătoase.
+                </MudText>
+                
+                <MudGrid Justify="Justify.Center" Class="mt-8">
+                    <MudItem xs="12" sm="6" md="5">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Size="Size.Large" Href="account/login">
+                            Autentificare
+                        </MudButton>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="5">
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" Size="Size.Large" Href="account/register">
+                            Înregistrare
+                        </MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+            
+            <MudGrid Class="mt-8">
+                <MudItem xs="12" sm="4">
+                    <MudPaper Elevation="2" Class="pa-4 d-flex flex-column align-center">
+                        <MudIcon Icon="@Icons.Material.Filled.Book" Color="Color.Primary" Size="Size.Large" Class="mb-3" />
+                        <MudText Typo="Typo.h6" Align="Align.Center">Jurnal zilnic</MudText>
+                        <MudText Typo="Typo.body2" Align="Align.Center">Înregistrează-ți starea de spirit și gândurile zilnice.</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudPaper Elevation="2" Class="pa-4 d-flex flex-column align-center">
+                        <MudIcon Icon="@Icons.Material.Filled.BarChart" Color="Color.Secondary" Size="Size.Large" Class="mb-3" />
+                        <MudText Typo="Typo.h6" Align="Align.Center">Statistici</MudText>
+                        <MudText Typo="Typo.body2" Align="Align.Center">Vizualizează tendințele și progresul tău în timp.</MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudPaper Elevation="2" Class="pa-4 d-flex flex-column align-center">
+                        <MudIcon Icon="@Icons.Material.Filled.LibraryBooks" Color="Color.Info" Size="Size.Large" Class="mb-3" />
+                        <MudText Typo="Typo.h6" Align="Align.Center">Resurse</MudText>
+                        <MudText Typo="Typo.body2" Align="Align.Center">Accesează articole și sfaturi pentru sănătatea mentală.</MudText>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudContainer>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private bool _isFirstRender = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _isFirstRender = false;
+            try
+            {
+                // Verificăm dacă utilizatorul tocmai s-a autentificat
+                var loginSuccess = await JSRuntime.InvokeAsync<bool>("authHelpers.checkLoginSuccess");
+                if (loginSuccess)
+                {
+                    // Ștergem flag-ul și reîncărcăm pagina pentru a actualiza starea de autentificare
+                    await JSRuntime.InvokeVoidAsync("authHelpers.clearLoginSuccess");
+                    await JSRuntime.InvokeVoidAsync("authHelpers.forceReload");
+                }
+            }
+            catch (Exception)
+            {
+                // Ignorăm orice eroare care poate apărea în timpul invocării JavaScript
+            }
+        }
+    }
+}

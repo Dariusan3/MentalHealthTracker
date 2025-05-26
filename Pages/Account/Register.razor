@@ -1,0 +1,188 @@
+@page "/account/register"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using MentalHealthTracker.Models
+@using MudBlazor
+@using System.Net.Http.Json
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Mental Health Tracker - Înregistrare</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex justify-center align-center" Style="height: 90vh;">
+    <MudCard Elevation="3" Class="rounded-lg pa-4" Style="width: 100%;">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">Înregistrare cont nou</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <MudAlert Severity="Severity.Error" Class="mb-4" Variant="Variant.Filled">@errorMessage</MudAlert>
+            }
+            
+            <EditForm Model="@registerRequest" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+                <MudGrid>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="registerRequest.FirstName" 
+                                     Label="Nume" 
+                                     Variant="Variant.Outlined" 
+                                     Required="true" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="registerRequest.LastName" 
+                                     Label="Prenume" 
+                                     Variant="Variant.Outlined" 
+                                     Required="true" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="registerRequest.Email" 
+                                     Label="Email" 
+                                     Variant="Variant.Outlined" 
+                                     InputType="InputType.Email"
+                                     Required="true" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="registerRequest.Password" 
+                                     Label="Parolă" 
+                                     Variant="Variant.Outlined" 
+                                     InputType="@passwordInputType"
+                                     Adornment="Adornment.End" 
+                                     AdornmentIcon="@passwordIcon" 
+                                     OnAdornmentClick="TogglePasswordVisibility"
+                                     Required="true"
+                                     HelperText="Parola trebuie să aibă cel puțin 6 caractere" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="registerRequest.ConfirmPassword" 
+                                     Label="Confirmă parola" 
+                                     Variant="Variant.Outlined" 
+                                     InputType="@passwordInputType"
+                                     Adornment="Adornment.End" 
+                                     AdornmentIcon="@passwordIcon" 
+                                     OnAdornmentClick="TogglePasswordVisibility"
+                                     Required="true" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudDatePicker @bind-Date="registerRequest.DateOfBirth" 
+                                      Label="Data nașterii" 
+                                      Variant="Variant.Outlined"
+                                      Placeholder="Selectează data nașterii"
+                                      YearSelector />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudButton ButtonType="ButtonType.Submit" 
+                                  Variant="Variant.Filled" 
+                                  Color="Color.Primary" 
+                                  Size="Size.Large"
+                                  FullWidth="true"
+                                  Disabled="@isProcessing">
+                            @if (isProcessing)
+                            {
+                                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                <MudText Class="ms-2">Se procesează...</MudText>
+                            }
+                            else
+                            {
+                                <MudText>Înregistrare</MudText>
+                            }
+                        </MudButton>
+                    </MudItem>
+                </MudGrid>
+            </EditForm>
+        </MudCardContent>
+        <MudCardActions Class="d-flex justify-center pb-4 flex-column">
+            <MudText Align="Align.Center" Class="mb-2">Ai deja cont?</MudText>
+            <a href="/account/login" class="mud-button-root mud-button mud-button-outlined mud-button-outlined-secondary mud-button-filled-size-medium mud-ripple mud-width-full">
+                <span class="mud-button-label">Autentifică-te</span>
+            </a>
+        </MudCardActions>
+    </MudCard>
+</MudContainer>
+
+@code {
+    private RegisterRequest registerRequest = new RegisterRequest();
+    private bool isProcessing = false;
+    private string? errorMessage;
+    
+    private bool isPasswordVisible = false;
+    private InputType passwordInputType => isPasswordVisible ? InputType.Text : InputType.Password;
+    private string passwordIcon => isPasswordVisible ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility;
+    
+    private void TogglePasswordVisibility()
+    {
+        isPasswordVisible = !isPasswordVisible;
+    }
+    
+    private async Task HandleSubmit()
+    {
+        if (isProcessing)
+            return;
+            
+        isProcessing = true;
+        errorMessage = null;
+        
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/account/register", registerRequest);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<RegisterResponse>();
+                if (result != null && result.Success)
+                {
+                    try
+                    {
+                        // Setăm flag-ul de autentificare reușită
+                        await JSRuntime.InvokeVoidAsync("authHelpers.setLoginSuccess");
+                        
+                        // Redirecționăm către pagina principală
+                        NavigationManager.NavigateTo("/", true);
+                    }
+                    catch (Exception)
+                    {
+                        // Dacă apelul JavaScript eșuează, folosim doar redirecționarea
+                        NavigationManager.NavigateTo("/", true);
+                    }
+                    return;
+                }
+            }
+            else
+            {
+                var errorResult = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+                errorMessage = errorResult?.Message ?? "Eroare la înregistrare. Te rugăm să încerci din nou.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Eroare la înregistrare: {ex.Message}";
+        }
+        
+        isProcessing = false;
+        StateHasChanged();
+    }
+    
+    private class RegisterRequest
+    {
+        public string FirstName { get; set; } = "";
+        public string LastName { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Password { get; set; } = "";
+        public string ConfirmPassword { get; set; } = "";
+        public DateTime? DateOfBirth { get; set; }
+    }
+    
+    private class RegisterResponse
+    {
+        public bool Success { get; set; }
+        public string RedirectUrl { get; set; } = "/";
+    }
+    
+    private class ErrorResponse
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = "";
+    }
+} 

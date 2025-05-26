@@ -1,0 +1,136 @@
+@page "/resurse"
+@using MudBlazor
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+
+<PageTitle>Mental Health Tracker - Resurse</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <div class="d-flex justify-space-between align-center mb-4">
+        <MudText Typo="Typo.h3">Resurse pentru sănătatea mentală</MudText>
+        <MudButton Variant="Variant.Outlined" 
+                  Color="Color.Primary" 
+                  StartIcon="@Icons.Material.Filled.ArrowBack"
+                  Href="/"
+                  Class="ml-auto">
+            Înapoi la pagina principală
+        </MudButton>
+    </div>
+
+    <MudGrid>
+        <MudItem xs="12" sm="6">
+            <MudCard Elevation="3" Class="rounded-lg">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5">Articole</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIcon Icon="@Icons.Material.Filled.Article" Color="Color.Primary" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudList Clickable="true">
+                        <MudListItem>
+                            <MudText Typo="Typo.h6">Importanța somnului pentru sănătatea mentală</MudText>
+                            <MudText Typo="Typo.body2" Class="mt-1">Somnul adecvat este esențial pentru menținerea unei bune sănătăți mentale.</MudText>
+                            <div class="d-flex justify-end mt-2">
+                                <MudButton Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ReadMore">Citește mai mult</MudButton>
+                            </div>
+                        </MudListItem>
+                        <MudDivider />
+                        <MudListItem>
+                            <MudText Typo="Typo.h6">Tehnici de relaxare pentru reducerea stresului</MudText>
+                            <MudText Typo="Typo.body2" Class="mt-1">Învață tehnici simple de relaxare pentru a reduce nivelul de stres zilnic.</MudText>
+                            <div class="d-flex justify-end mt-2">
+                                <MudButton Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ReadMore">Citește mai mult</MudButton>
+                            </div>
+                        </MudListItem>
+                        <MudDivider />
+                        <MudListItem>
+                            <MudText Typo="Typo.h6">Beneficiile exercițiilor fizice pentru sănătatea mentală</MudText>
+                            <MudText Typo="Typo.body2" Class="mt-1">Exercițiile fizice regulate pot îmbunătăți semnificativ starea de spirit.</MudText>
+                            <div class="d-flex justify-end mt-2">
+                                <MudButton Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ReadMore">Citește mai mult</MudButton>
+                            </div>
+                        </MudListItem>
+                    </MudList>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        
+        <MudItem xs="12" sm="6">
+            <MudCard Elevation="3" Class="rounded-lg">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5">Exerciții</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIcon Icon="@Icons.Material.Filled.FitnessCenter" Color="Color.Secondary" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudList Clickable="true">
+                        <MudListItem>
+                            <MudText Typo="Typo.h6">Exerciții de respirație</MudText>
+                            <MudText Typo="Typo.body2" Class="mt-1">Tehnici simple de respirație pentru reducerea anxietății.</MudText>
+                            <div class="d-flex justify-end mt-2">
+                                <MudButton Variant="Variant.Text" Color="Color.Secondary" EndIcon="@Icons.Material.Filled.PlayArrow">Încearcă acum</MudButton>
+                            </div>
+                        </MudListItem>
+                        <MudDivider />
+                        <MudListItem>
+                            <MudText Typo="Typo.h6">Meditație ghidată</MudText>
+                            <MudText Typo="Typo.body2" Class="mt-1">Meditație ghidată pentru relaxare și reducerea stresului.</MudText>
+                            <div class="d-flex justify-end mt-2">
+                                <MudButton Variant="Variant.Text" Color="Color.Secondary" EndIcon="@Icons.Material.Filled.PlayArrow">Încearcă acum</MudButton>
+                            </div>
+                        </MudListItem>
+                        <MudDivider />
+                        <MudListItem>
+                            <MudText Typo="Typo.h6">Jurnal de recunoștință</MudText>
+                            <MudText Typo="Typo.body2" Class="mt-1">Exerciții pentru dezvoltarea unei atitudini de recunoștință.</MudText>
+                            <div class="d-flex justify-end mt-2">
+                                <MudButton Variant="Variant.Text" Color="Color.Secondary" EndIcon="@Icons.Material.Filled.PlayArrow">Încearcă acum</MudButton>
+                            </div>
+                        </MudListItem>
+                    </MudList>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        
+        <MudItem xs="12" Class="mt-4">
+            <MudCard Elevation="3" Class="rounded-lg">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5">Linii de asistență</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIcon Icon="@Icons.Material.Filled.Call" Color="Color.Info" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                            <MudAlert Severity="Severity.Info" Variant="Variant.Filled" Class="mud-elevation-3">
+                                <div class="d-flex flex-column">
+                                    <MudText Typo="Typo.h6">Linia telefonică de urgență pentru sănătate mentală</MudText>
+                                    <MudText Typo="Typo.body1" Class="mt-2">Apel gratuit, disponibil 24/7</MudText>
+                                    <MudText Typo="Typo.h6" Class="mt-2"><MudIcon Icon="@Icons.Material.Filled.Phone" Class="mr-2" /> 0800 123 456</MudText>
+                                </div>
+                            </MudAlert>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudAlert Severity="Severity.Info" Variant="Variant.Filled" Class="mud-elevation-3">
+                                <div class="d-flex flex-column">
+                                    <MudText Typo="Typo.h6">Centrul de consiliere psihologică</MudText>
+                                    <MudText Typo="Typo.body1" Class="mt-2">Program: Luni-Vineri, 9:00-17:00</MudText>
+                                    <MudText Typo="Typo.h6" Class="mt-2"><MudIcon Icon="@Icons.Material.Filled.Phone" Class="mr-2" /> 021 123 4567</MudText>
+                                </div>
+                            </MudAlert>
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</MudContainer> 

@@ -1,0 +1,141 @@
+@page "/profil"
+@using MudBlazor
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+
+<PageTitle>Mental Health Tracker - Profil</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <div class="d-flex justify-space-between align-center mb-4">
+        <MudText Typo="Typo.h3">Profilul meu</MudText>
+        <MudButton Variant="Variant.Outlined" 
+                  Color="Color.Primary" 
+                  StartIcon="@Icons.Material.Filled.ArrowBack"
+                  Href="/"
+                  Class="ml-auto">
+            Înapoi la pagina principală
+        </MudButton>
+    </div>
+
+    <MudGrid>
+        <MudItem xs="12" sm="6">
+            <MudCard Elevation="3" Class="rounded-lg">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5">Informații personale</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Primary" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTextField T="string" Label="Nume" Variant="Variant.Outlined" Value="@nume" Class="mt-3" />
+                    <MudTextField T="string" Label="Email" Variant="Variant.Outlined" Value="@email" Class="mt-3" />
+                    <MudDatePicker Label="Data nașterii" Variant="Variant.Outlined" Date="@dataNasterii" Class="mt-3" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@SalveazaModificari">Salvează modificările</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        
+        <MudItem xs="12" sm="6">
+            <MudCard Elevation="3" Class="rounded-lg">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5">Preferințe</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIcon Icon="@Icons.Material.Filled.Settings" Color="Color.Secondary" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudSwitch @bind-Value="@notificariZilnice" Color="Color.Primary" Label="Primește notificări zilnice" Class="mt-3" />
+                    <MudSwitch @bind-Value="@rapoarteSaptamanale" Color="Color.Primary" Label="Primește rapoarte săptămânale" Class="mt-3" />
+                    <MudTimePicker Label="Ora notificării zilnice" Variant="Variant.Outlined" Time="@oraNotificare" Class="mt-3" />
+                    <MudSelect T="string" Label="Tema aplicației" Variant="Variant.Outlined" Value="@tema" Class="mt-3">
+                        <MudSelectItem Value="@("light")">Luminoasă</MudSelectItem>
+                        <MudSelectItem Value="@("dark")">Întunecată</MudSelectItem>
+                        <MudSelectItem Value="@("auto")">Automată (bazată pe setările sistemului)</MudSelectItem>
+                    </MudSelect>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@SalveazaPreferinte">Salvează preferințele</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        
+        <MudItem xs="12" Class="mt-4">
+            <MudCard Elevation="3" Class="rounded-lg">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5">Securitate</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIcon Icon="@Icons.Material.Filled.Security" Color="Color.Error" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTextField T="string" Label="Parola actuală" Variant="Variant.Outlined" InputType="@passwordInputType" Adornment="Adornment.End" AdornmentIcon="@passwordIcon" OnAdornmentClick="@TogglePasswordVisibility" Class="mt-3" />
+                    <MudTextField T="string" Label="Parola nouă" Variant="Variant.Outlined" InputType="@passwordInputType" Adornment="Adornment.End" AdornmentIcon="@passwordIcon" OnAdornmentClick="@TogglePasswordVisibility" Class="mt-3" />
+                    <MudTextField T="string" Label="Confirmă parola nouă" Variant="Variant.Outlined" InputType="@passwordInputType" Adornment="Adornment.End" AdornmentIcon="@passwordIcon" OnAdornmentClick="@TogglePasswordVisibility" Class="mt-3" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@SchimbaParola">Schimbă parola</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        
+        <MudItem xs="12" Class="mt-4">
+            <MudPaper Elevation="3" Class="pa-4 rounded-lg">
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Class="mb-4">
+                    <MudText>Atenție! Acțiunile de mai jos sunt ireversibile.</MudText>
+                </MudAlert>
+                <MudButton Variant="Variant.Filled" Color="Color.Error" FullWidth="true" OnClick="@ShowDeleteDialog">
+                    Șterge contul meu
+                </MudButton>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private string nume = "Utilizator Demo";
+    private string email = "utilizator@example.com";
+    private DateTime? dataNasterii = new DateTime(1990, 1, 1);
+    
+    private bool notificariZilnice = true;
+    private bool rapoarteSaptamanale = true;
+    private TimeSpan? oraNotificare = new TimeSpan(20, 0, 0);
+    private string tema = "light";
+    
+    private bool isPasswordVisible = false;
+    private InputType passwordInputType => isPasswordVisible ? InputType.Text : InputType.Password;
+    private string passwordIcon => isPasswordVisible ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility;
+    
+    private void TogglePasswordVisibility()
+    {
+        isPasswordVisible = !isPasswordVisible;
+    }
+    
+    private void SalveazaModificari()
+    {
+        Snackbar.Add("Modificări salvate!", Severity.Success);
+    }
+    
+    private void SalveazaPreferinte()
+    {
+        Snackbar.Add("Preferințe salvate!", Severity.Success);
+    }
+    
+    private void SchimbaParola()
+    {
+        Snackbar.Add("Parola schimbată cu succes!", Severity.Success);
+    }
+    
+    private void ShowDeleteDialog()
+    {
+        Snackbar.Add("Funcționalitate în dezvoltare", Severity.Info);
+    }
+} 

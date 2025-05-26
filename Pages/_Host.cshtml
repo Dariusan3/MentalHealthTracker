@@ -1,0 +1,116 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Http
+@namespace MentalHealthTracker.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    Layout = "_Layout";
+}
+
+<component type="typeof(App)" render-mode="Server" />
+
+<script>
+    // Verifică la încărcarea paginii
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('DOM încărcat, verificare autentificare...');
+        
+        try {
+            // Verificăm starea de autentificare
+            if (window.checkAuthStatus) {
+                window.checkAuthStatus();
+            }
+            
+            // Verificăm dacă trebuie să sincronizăm autentificarea
+            if (window.syncAuthStateFromLocalStorage) {
+                window.syncAuthStateFromLocalStorage();
+            }
+            
+            // Verificăm dacă trebuie să reîncărcăm pagina
+            const loginSuccess = sessionStorage.getItem('login_success') === 'true';
+            if (loginSuccess) {
+                console.log('Autentificare reușită detectată, se reîncarcă pagina...');
+                sessionStorage.removeItem('login_success');
+                
+                // Setăm flag-ul pentru a evita bucla infinită
+                sessionStorage.setItem('tried_reload', 'true');
+                
+                // Ștergem flag-ul după 5 secunde
+                setTimeout(function() {
+                    sessionStorage.removeItem('tried_reload');
+                }, 5000);
+                
+                location.reload();
+            }
+        } catch (error) {
+            console.error('Eroare la verificarea autentificării:', error);
+        }
+    });
+    
+    // Funcție pentru a face cereri POST direct din JavaScript
+    window.sendPostRequest = async function(url, jsonData) {
+        console.log('Trimit cerere POST către:', url);
+        console.log('Date JSON:', jsonData);
+        
+        try {
+            // Obținem cookie-urile pentru CSRF
+            const antiforgeryToken = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            
+            // Configurăm cererea
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: jsonData,
+                credentials: 'include' // Include cookies
+            };
+            
+            // Adăugăm token-ul antiforgery dacă există
+            if (antiforgeryToken) {
+                options.headers['RequestVerificationToken'] = antiforgeryToken;
+            }
+            
+            console.log('Opțiuni cerere:', options);
+            
+            // Facem cererea
+            const response = await fetch(url, options);
+            console.log('Răspuns primit:', response);
+            
+            // Verificăm status-ul
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Date primite:', data);
+                return data;
+            } else {
+                const errorText = await response.text();
+                console.error('Eroare HTTP:', response.status, errorText);
+                alert(`Eroare HTTP: ${response.status} - ${errorText}`);
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Eroare la trimiterea cererii POST:', error);
+            alert(`Eroare la trimiterea cererii: ${error.message}`);
+            throw error;
+        }
+    };
+    
+    // Funcție pentru a verifica dacă API-ul este disponibil
+    window.checkApiAvailable = async function() {
+        try {
+            const baseUrl = window.location.origin;
+            const response = await fetch(`${baseUrl}/api/MoodEntries/test`);
+            console.log('API test response:', response);
+            if (response.ok) {
+                const text = await response.text();
+                console.log('API test result:', text);
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('API test error:', error);
+            return false;
+        }
+    };
+</script>

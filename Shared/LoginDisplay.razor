@@ -1,0 +1,78 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using MentalHealthTracker.Models
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject SignInManager<ApplicationUser> SignInManager
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+
+<AuthorizeView>
+    <Authorized>
+        <MudMenu Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" AnchorOrigin="Origin.BottomRight">
+            <MudMenuItem>
+                <div class="d-flex flex-column">
+                    <MudText Typo="Typo.subtitle1">@context.User.Identity?.Name</MudText>
+                    <MudText Typo="Typo.caption">Utilizator autentificat</MudText>
+                </div>
+            </MudMenuItem>
+            <MudDivider />
+            <MudMenuItem Href="profil" Icon="@Icons.Material.Filled.Person">Profil</MudMenuItem>
+            <MudMenuItem Href="jurnal" Icon="@Icons.Material.Filled.Book">Jurnal</MudMenuItem>
+            <MudMenuItem Href="statistici" Icon="@Icons.Material.Filled.BarChart">Statistici</MudMenuItem>
+            <MudMenuItem Href="resurse" Icon="@Icons.Material.Filled.LibraryBooks">Resurse</MudMenuItem>
+            <MudDivider />
+            <MudMenuItem OnClick="CheckAuthStatus" Icon="@Icons.Material.Filled.Security">Verifică Autentificarea</MudMenuItem>
+            <MudMenuItem OnClick="BeginSignOut" Icon="@Icons.Material.Filled.Logout">Deconectare</MudMenuItem>
+        </MudMenu>
+    </Authorized>
+    <NotAuthorized>
+        <MudStack Row="true">
+            <MudButton Variant="Variant.Text" Color="Color.Inherit" Href="account/register">Înregistrare</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="account/login">Autentificare</MudButton>
+        </MudStack>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private async Task CheckAuthStatus()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
+        var userName = authState.User.Identity?.Name ?? "necunoscut";
+        
+        await JSRuntime.InvokeVoidAsync("alert", isAuthenticated 
+            ? $"Autentificat ca: {userName}" 
+            : "Nu sunteți autentificat");
+    }
+    
+    private async Task BeginSignOut()
+    {
+        try
+        {
+            // Forțăm ștergerea datelor din localStorage și sessionStorage
+            await JSRuntime.InvokeVoidAsync("localStorage.clear");
+            await JSRuntime.InvokeVoidAsync("sessionStorage.clear");
+            
+            // Forțăm ștergerea cookie-urilor prin JavaScript
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                document.cookie.split(';').forEach(function(c) {
+                    document.cookie = c.trim().split('=')[0] + '=;' + 'expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;';
+                });
+            ");
+            
+            // Afișăm un mesaj de confirmare
+            await JSRuntime.InvokeVoidAsync("alert", "Ați fost deconectat cu succes!");
+            
+            // Redirecționăm către endpoint-ul de deconectare directă
+            NavigationManager.NavigateTo("/api/account/logout-direct", true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Eroare la deconectare: {ex.Message}");
+            
+            // În caz de eroare, redirecționăm oricum către endpoint-ul de deconectare
+            NavigationManager.NavigateTo("/api/account/logout-direct", true);
+        }
+    }
+} 

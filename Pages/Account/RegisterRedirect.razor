@@ -1,0 +1,9 @@
+@page "/account/register-redirect"
+@inject NavigationManager NavigationManager
+
+@code {
+    protected override void OnInitialized()
+    {
+        NavigationManager.NavigateTo("/account/register", true);
+    }
+} 

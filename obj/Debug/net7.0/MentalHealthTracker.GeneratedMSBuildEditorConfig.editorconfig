@@ -1,0 +1,109 @@
+is_global = true
+build_property.TargetFramework = net7.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = MentalHealthTracker
+build_property.RootNamespace = MentalHealthTracker
+build_property.ProjectDir = /Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 7.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = /Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 7.0
+build_property.EnableCodeStyleSeverity = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Pages/Account/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWNjb3VudC9Mb2dpbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Pages/Account/LoginRedirect.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWNjb3VudC9Mb2dpblJlZGlyZWN0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Pages/Account/Register.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWNjb3VudC9SZWdpc3Rlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Pages/Account/RegisterRedirect.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWNjb3VudC9SZWdpc3RlclJlZGlyZWN0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Pages/Counter.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ291bnRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Pages/EditareJurnal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRWRpdGFyZUp1cm5hbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Pages/FetchData.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRmV0Y2hEYXRhLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Pages/Jurnal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSnVybmFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Pages/Profil.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZmlsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Pages/Resurse.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUmVzdXJzZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Pages/Statistici.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU3RhdGlzdGljaS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Shared/LoginDisplay.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0xvZ2luRGlzcGxheS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Shared/RedirectToLogin.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1JlZGlyZWN0VG9Mb2dpbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Shared/SurveyPrompt.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1N1cnZleVByb21wdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Shared/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL01haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-8caai3t6rg
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Shared/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL05hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-ibktastgtw
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Pages/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Pages/_Host.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvX0hvc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/Pages/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvX0xheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 

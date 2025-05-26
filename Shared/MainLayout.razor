@@ -1,0 +1,119 @@
+﻿@inherits LayoutComponentBase
+@using MudBlazor
+@using MentalHealthTracker.Shared
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Web
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<MudThemeProvider Theme="AppTheme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudText Typo="Typo.h6" Class="ml-3">Mental Health Tracker</MudText>
+        <MudSpacer />
+        <LoginDisplay />
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-4 pt-4">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private bool _drawerOpen = true;
+    private bool _isAuthenticated = false;
+    private string _userName = "";
+
+    private void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private MudTheme AppTheme = new MudTheme()
+    {
+        Palette = new PaletteLight()
+        {
+            Primary = Colors.Blue.Darken1,
+            Secondary = Colors.DeepPurple.Accent2,
+            AppbarBackground = Colors.Blue.Darken3,
+            Background = Colors.Grey.Lighten5,
+        },
+        PaletteDark = new PaletteDark()
+        {
+            Primary = Colors.Blue.Lighten1,
+            Secondary = Colors.DeepPurple.Accent1,
+            AppbarBackground = Colors.Blue.Darken4,
+            Background = Colors.Grey.Darken4,
+        }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        
+        // Verificăm starea de autentificare
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        _isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
+        _userName = authState.User.Identity?.Name ?? "";
+        
+        Console.WriteLine($"OnInitializedAsync: Autentificat: {_isAuthenticated}, Utilizator: {_userName}");
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                // Verificăm starea de autentificare din JavaScript
+                await JSRuntime.InvokeVoidAsync("checkAuthStatus");
+                
+                // Verificăm starea de autentificare din .NET
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                _isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
+                _userName = authState.User.Identity?.Name ?? "";
+                
+                Console.WriteLine($"OnAfterRenderAsync: Autentificat: {_isAuthenticated}, Utilizator: {_userName}");
+                
+                // Verificăm dacă avem informații de autentificare în localStorage
+                var localAuthState = await JSRuntime.InvokeAsync<AuthState>("authHelpers.getLocalAuthState");
+                var triedRefresh = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "tried_refresh") == "true";
+                
+                if (localAuthState.IsAuthenticated && !triedRefresh && !_isAuthenticated)
+                {
+                    Console.WriteLine($"Stare autentificare găsită în localStorage dar nu în sesiune: {localAuthState.UserName}");
+                    
+                    // Setăm flag-ul pentru a evita bucla infinită
+                    await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "tried_refresh", "true");
+                    
+                    // Forțăm reîmprospătarea sesiunii
+                    await JSRuntime.InvokeVoidAsync("forceAuthRefresh");
+                    
+                    // Ștergem flag-ul după 5 secunde
+                    await Task.Delay(5000);
+                    await JSRuntime.InvokeVoidAsync("sessionStorage.removeItem", "tried_refresh");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Eroare în OnAfterRenderAsync: {ex.Message}");
+            }
+        }
+    }
+
+    private class AuthState
+    {
+        public bool IsAuthenticated { get; set; }
+        public string UserId { get; set; } = "";
+        public string UserName { get; set; } = "";
+    }
+}
