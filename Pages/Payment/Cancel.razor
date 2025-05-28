@@ -1,0 +1,42 @@
+@page "/payment/cancel"
+@inject NavigationManager NavigationManager
+
+<PageTitle>Plată anulată</PageTitle>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-times-circle text-danger" style="font-size: 5rem;"></i>
+                    </div>
+                    <h2 class="card-title">Plată anulată</h2>
+                    <p class="card-text lead">Plata ta a fost anulată.</p>
+                    <p>Nicio sumă nu a fost retrasă din contul tău.</p>
+                    
+                    <hr>
+                    
+                    <button class="btn btn-primary mt-3" @onclick="GoToSubscription">
+                        Încearcă din nou
+                    </button>
+                    <button class="btn btn-outline-secondary mt-3 ms-2" @onclick="GoToHome">
+                        Înapoi la pagina principală
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private void GoToSubscription()
+    {
+        NavigationManager.NavigateTo("/subscription");
+    }
+
+    private void GoToHome()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+} 

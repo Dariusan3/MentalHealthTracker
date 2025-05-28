@@ -74,6 +74,10 @@
             "MudBlazor": {
               "target": "Package",
               "version": "[6.11.2, )"
+            },
+            "Stripe.net": {
+              "target": "Package",
+              "version": "[48.1.0, )"
             }
           },
           "imports": [

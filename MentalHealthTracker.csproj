@@ -17,6 +17,7 @@
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.48.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.AzureAIInference" Version="1.48.0-beta" />
     <PackageReference Include="MudBlazor" Version="6.11.2" />
+    <PackageReference Include="Stripe.net" Version="48.1.0" />
   </ItemGroup>
 
 </Project>

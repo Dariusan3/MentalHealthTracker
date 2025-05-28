@@ -1,0 +1,286 @@
+<style>
+    .glass-card {
+        background: rgba(255,255,255,0.95);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+        backdrop-filter: blur(8px);
+        border-radius: 1.5rem;
+        border: 1px solid rgba(255,255,255,0.18);
+        padding: 2.5rem 2.5rem 2rem 2.5rem;
+        margin-bottom: 2.5rem;
+    }
+    .premium-badge {
+        display: inline-block;
+        background: linear-gradient(90deg, #FFD700 0%, #FFB300 100%);
+        color: #fff;
+        font-weight: bold;
+        padding: 0.4rem 1.2rem;
+        border-radius: 2rem;
+        font-size: 1.1rem;
+        box-shadow: 0 2px 8px rgba(255, 215, 0, 0.15);
+        letter-spacing: 1px;
+    }
+    .benefit-card {
+        background: #fff;
+        border-radius: 1.2rem;
+        box-shadow: 0 2px 12px rgba(33,150,243,0.07);
+        padding: 2rem 1.5rem 1.5rem 1.5rem;
+        margin-bottom: 2.2rem;
+        text-align: center;
+    }
+    .benefit-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1.2rem;
+        letter-spacing: 1px;
+    }
+    .benefit-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.1rem;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    .benefit-item {
+        display: flex;
+        align-items: center;
+        font-size: 1.15rem;
+        background: #f8fafc;
+        border-radius: 0.8rem;
+        padding: 0.7rem 1.2rem;
+        min-width: 270px;
+        box-shadow: 0 1px 4px rgba(33,150,243,0.04);
+    }
+    .benefit-icon {
+        font-size: 1.7rem;
+        margin-right: 1rem;
+        vertical-align: middle;
+    }
+    .stripe-btn {
+        background: linear-gradient(90deg, #635bff 0%, #00c3ff 100%);
+        color: #fff;
+        font-weight: 600;
+        border: none;
+        border-radius: 2rem;
+        padding: 0.9rem 2.2rem;
+        font-size: 1.2rem;
+        box-shadow: 0 2px 8px rgba(99,91,255,0.15);
+        transition: background 0.2s, box-shadow 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.7rem;
+        margin: 0 auto;
+    }
+    .stripe-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    .price-card {
+        background: linear-gradient(90deg, #f8fafc 0%, #e3f2fd 100%);
+        border-radius: 1.2rem;
+        box-shadow: 0 2px 12px rgba(33,150,243,0.07);
+        padding: 1.5rem 1.5rem 1.2rem 1.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    .price-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 0.2rem;
+        color: #635bff;
+    }
+    .price-sub {
+        color: #888;
+        font-size: 1.1rem;
+        margin-bottom: 1.2rem;
+    }
+    .plan-status {
+        background: #fff;
+        border-radius: 1.2rem;
+        box-shadow: 0 2px 12px rgba(33,150,243,0.07);
+        padding: 1.2rem 1.5rem;
+        margin-top: 2rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    .stripe-logo {
+        height: 1.5rem;
+        margin-left: 0.5rem;
+    }
+    .info-card {
+        background: #f8fafc;
+        border-radius: 1.2rem;
+        box-shadow: 0 2px 12px rgba(33,150,243,0.07);
+        padding: 1rem 1.5rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+</style>
+
+@page "/subscription"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Web
+@using System.Security.Claims
+@using MentalHealthTracker.Services
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Abonament Premium</PageTitle>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
+            <div class="glass-card">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h2 class="mb-0 fw-bold" style="letter-spacing:1px;">Abonament Premium</h2>
+                    @if (isSubscribed)
+                    {
+                        <span class="premium-badge"><i class="fas fa-crown me-2"></i>Premium</span>
+                    }
+                </div>
+                <div class="benefit-card mb-4">
+                    <div class="benefit-title">Ce primești cu Premium?</div>
+                    <ul class="benefit-list">
+                        <li class="benefit-item"><span class="benefit-icon text-warning"><i class="fas fa-infinity"></i></span>Conversații nelimitate cu chatbot-ul AI</li>
+                        <li class="benefit-item"><span class="benefit-icon text-primary"><i class="fas fa-bolt"></i></span>Fără limită zilnică de mesaje</li>
+                        <li class="benefit-item"><span class="benefit-icon text-success"><i class="fas fa-star"></i></span>Acces prioritar la funcții noi</li>
+                        <li class="benefit-item"><span class="benefit-icon text-info"><i class="fas fa-headset"></i></span>Suport tehnic prioritar</li>
+                    </ul>
+                </div>
+                <div class="price-card mb-4">
+                    <div class="price-title">9,99 RON</div>
+                    <div class="price-sub">/ lună</div>
+                    @if (isSubscribed)
+                    {
+                        <div class="alert alert-success text-center mb-0">
+                            <h5 class="alert-heading mb-1">Ești deja abonat!</h5>
+                            <p class="mb-0">Te bucuri deja de toate beneficiile Premium.<br />Mulțumim pentru susținere!</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <button @onclick="GoToCheckout" class="stripe-btn w-100 mb-2" disabled="@isLoading">
+                            <span><i class="fab fa-stripe-s"></i> Abonează-te cu Stripe</span>
+                            @if (isLoading)
+                            {
+                                <span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>
+                            }
+                        </button>
+                    }
+                </div>
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="alert alert-danger mt-3 text-center">
+                        @errorMessage
+                    </div>
+                }
+                <div class="plan-status">
+                    <h5 class="mb-2">Planul tău actual</h5>
+                    @if (isSubscribed)
+                    {
+                        <h5 class="text-success mb-1"><i class="fas fa-crown me-2"></i>Premium</h5>
+                        <p class="mb-0">Ai acces nelimitat la toate funcționalitățile.</p>
+                    }
+                    else
+                    {
+                        <h5 class="mb-1">Plan gratuit</h5>
+                        <p class="mb-0">Ți-au mai rămas <strong>@messagesLeftToday</strong> mesaje pentru astăzi.</p>
+                    }
+                </div>
+                <div class="info-card mt-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/62/Stripe_Logo%2C_revised_2016.png" class="stripe-logo" alt="Stripe" />
+                    <small class="text-muted ms-2">Plățile sunt procesate în siguranță prin Stripe. Te poți dezabona oricând din contul tău.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool isSubscribed = false;
+    private int messagesLeftToday = 0;
+    private bool isLoading = false;
+    private string errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetSubscriptionStatus();
+    }
+
+    private async Task GetSubscriptionStatus()
+    {
+        try
+        {
+            var response = await Http.GetAsync("api/payment/subscription-status");
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<SubscriptionStatus>();
+                if (result != null)
+                {
+                    isSubscribed = result.IsSubscribed;
+                    messagesLeftToday = result.MessagesLeftToday;
+                }
+            }
+            else
+            {
+                errorMessage = "Nu am putut obține statusul abonamentului.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Eroare: {ex.Message}";
+        }
+    }
+
+    private async Task GoToCheckout()
+    {
+        try
+        {
+            isLoading = true;
+            errorMessage = string.Empty;
+
+            var response = await Http.PostAsync("api/payment/create-checkout-session", null);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<CheckoutSessionResult>();
+                if (result != null && !string.IsNullOrEmpty(result.Url))
+                {
+                    NavigationManager.NavigateTo(result.Url);
+                }
+                else
+                {
+                    errorMessage = "Nu am putut obține URL-ul de plată.";
+                }
+            }
+            else
+            {
+                errorMessage = "Eroare la crearea sesiunii de plată.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Eroare: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private class SubscriptionStatus
+    {
+        public bool IsSubscribed { get; set; }
+        public int MessagesLeftToday { get; set; }
+    }
+
+    private class CheckoutSessionResult
+    {
+        public string Url { get; set; }
+    }
+} 

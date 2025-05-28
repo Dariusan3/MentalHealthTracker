@@ -64,6 +64,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSnVybmFsLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect2/MentalHealthTracker/Pages/Payment/Cancel.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGF5bWVudC9DYW5jZWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect2/MentalHealthTracker/Pages/Payment/Success.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGF5bWVudC9TdWNjZXNzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/osadici.darius/Documents/sem2/PDN/Proiect2/MentalHealthTracker/Pages/Profil.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZmlsLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
@@ -74,6 +82,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/Users/osadici.darius/Documents/sem2/PDN/Proiect2/MentalHealthTracker/Pages/Statistici.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU3RhdGlzdGljaS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/osadici.darius/Documents/sem2/PDN/Proiect2/MentalHealthTracker/Pages/Subscription.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU3Vic2NyaXB0aW9uLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/Users/osadici.darius/Documents/sem2/PDN/Proiect2/MentalHealthTracker/Shared/LoginDisplay.razor]

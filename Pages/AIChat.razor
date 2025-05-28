@@ -4,6 +4,7 @@
 @inject AIChatService AIChatService
 @inject ChatHistoryService ChatHistoryService
 @inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
 
 <PageTitle>Chat AI</PageTitle>
 
@@ -19,6 +20,20 @@
         <MudDivider Class="my-2" />
         <MudTextField @bind-Value="UserInput" Placeholder="Scrie un mesaj..." FullWidth="true" OnKeyDown="OnKeyDown" Disabled="@IsStreaming" />
         <MudButton OnClick="SendMessage" Disabled="@DisabledButton" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2">Trimite</MudButton>
+        
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <MudAlert Severity="Severity.Warning" Class="mt-3">
+                @ErrorMessage
+                @if (ErrorMessage.Contains("limita zilnică"))
+                {
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="GoToSubscription" Class="ml-2">
+                        Abonează-te acum
+                    </MudButton>
+                }
+            </MudAlert>
+        }
+        
         <MudText>@Response</MudText>
     </MudPaper>
 </MudContainer>
@@ -29,6 +44,7 @@
     private bool IsStreaming = false;
     private string CurrentStreaming = string.Empty;
     private string Response = string.Empty;
+    private string ErrorMessage = string.Empty;
 
     private bool DisabledButton => IsStreaming || string.IsNullOrWhiteSpace(UserInput);
 
@@ -44,6 +60,16 @@
     private async Task SendMessage()
     {
         if (string.IsNullOrWhiteSpace(UserInput)) return;
+
+        // Verifică dacă utilizatorul poate trimite un mesaj
+        var (isAllowed, errorMessage) = await ChatHistoryService.CanUserSendMessageAsync();
+        if (!isAllowed)
+        {
+            ErrorMessage = errorMessage;
+            return;
+        }
+
+        ErrorMessage = string.Empty;
 
         // Salvează mesajul userului
         await ChatHistoryService.AddMessageAsync("user", UserInput);
@@ -71,5 +97,10 @@
         {
             await SendMessage();
         }
+    }
+
+    private void GoToSubscription()
+    {
+        NavigationManager.NavigateTo("/subscription");
     }
 }

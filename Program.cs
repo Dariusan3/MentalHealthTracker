@@ -130,6 +130,10 @@ builder.Services.AddScoped<MoodService>();
 builder.Services.AddSingleton<AIChatService>();
 builder.Services.AddScoped<ChatHistoryService>();
 builder.Services.AddScoped<UserProfileService>();
+builder.Services.AddScoped<StripeService>();
+
+// Adăugăm un serviciu de background pentru resetarea zilnică a mesajelor
+builder.Services.AddHostedService<DailyMessageResetService>();
 
 var app = builder.Build();
 

@@ -1,0 +1,61 @@
+@page "/payment/success"
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@using Microsoft.AspNetCore.WebUtilities
+
+<PageTitle>Plată reușită</PageTitle>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+                    </div>
+                    <h2 class="card-title">Plată procesată cu succes!</h2>
+                    <p class="card-text lead">Îți mulțumim pentru abonare la planul Premium!</p>
+                    <p>Acum te poți bucura de conversații nelimitate cu chatbot-ul nostru.</p>
+                    
+                    <hr>
+                    
+                    <button class="btn btn-primary mt-3" @onclick="GoToChat">
+                        Începe să conversezi
+                    </button>
+                    <button class="btn btn-outline-secondary mt-3 ms-2" @onclick="GoToHome">
+                        Înapoi la pagina principală
+                    </button>
+                    
+                    <div class="mt-4">
+                        <small class="text-muted">
+                            Numărul tranzacției: @sessionId
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string sessionId = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("session_id", out var sessionIdValue))
+        {
+            sessionId = sessionIdValue;
+        }
+    }
+
+    private void GoToChat()
+    {
+        NavigationManager.NavigateTo("/aichat");
+    }
+
+    private void GoToHome()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+} 
