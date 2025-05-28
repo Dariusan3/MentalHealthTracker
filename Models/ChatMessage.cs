@@ -1,19 +1,28 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class ChatMessage
+namespace MentalHealthTracker.Models
 {
-    [Key]
-    public int Id { get; set; }
+    public class ChatMessage
+    {
+        [Key]
+        public int Id { get; set; }
 
-    [Required]
-    public required string UserId { get; set; }
+        [Required]
+        public string UserId { get; set; }
 
-    [Required]
-    public required string Role { get; set; } // "user" sau "assistant"
+        [Required]
+        public string Role { get; set; } // "user" sau "assistant"
 
-    [Required]
-    public required string Content { get; set; }
+        [Required]
+        public string Content { get; set; }
 
-    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+
+        public int? ConversationId { get; set; }
+
+        [ForeignKey("ConversationId")]
+        public virtual ChatConversation? Conversation { get; set; }
+    }
 } 

@@ -1,7 +1,4 @@
 using Microsoft.Extensions.Options;
-using OpenAI;
-using OpenAI.Chat;
-using System.ClientModel;
 using System.Text;
 using System.Net.Http;
 using System.Text.Json;
@@ -10,18 +7,7 @@ using MentalHealthTracker.Services;
 
 public class AIChatService
 {
-    private readonly ChatClient _client;
-    private readonly string _model = "mistral-7b-v02-int4-cpu";
-    private readonly string _baseUrl = "http://localhost:5272/v1/";
-    private readonly string _apiKey = "unused";
-
-    public AIChatService()
-    {
-        var options = new OpenAIClientOptions();
-        options.Endpoint = new Uri(_baseUrl);
-        ApiKeyCredential credential = new ApiKeyCredential(_apiKey);
-        _client = new OpenAIClient(credential, options).GetChatClient(_model);
-    }
+    public AIChatService() { }
 
     public async Task<string> GetChatResponseOllamaAsync(string prompt, IServiceProvider serviceProvider = null)
     {

@@ -34,7 +34,13 @@
                             <MudText Typo="Typo.h6">Importanța somnului pentru sănătatea mentală</MudText>
                             <MudText Typo="Typo.body2" Class="mt-1">Somnul adecvat este esențial pentru menținerea unei bune sănătăți mentale.</MudText>
                             <div class="d-flex justify-end mt-2">
-                                <MudButton Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ReadMore">Citește mai mult</MudButton>
+                                <MudButton Variant="Variant.Text" 
+                                         Color="Color.Primary" 
+                                         EndIcon="@Icons.Material.Filled.Launch"
+                                         Href="https://www.who.int/news-room/fact-sheets/detail/mental-health"
+                                         Target="_blank">
+                                    Citește pe WHO
+                                </MudButton>
                             </div>
                         </MudListItem>
                         <MudDivider />
@@ -42,7 +48,13 @@
                             <MudText Typo="Typo.h6">Tehnici de relaxare pentru reducerea stresului</MudText>
                             <MudText Typo="Typo.body2" Class="mt-1">Învață tehnici simple de relaxare pentru a reduce nivelul de stres zilnic.</MudText>
                             <div class="d-flex justify-end mt-2">
-                                <MudButton Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ReadMore">Citește mai mult</MudButton>
+                                <MudButton Variant="Variant.Text" 
+                                         Color="Color.Primary" 
+                                         EndIcon="@Icons.Material.Filled.Launch"
+                                         Href="https://www.mayoclinic.org/healthy-lifestyle/stress-management/in-depth/relaxation-technique/art-20045368"
+                                         Target="_blank">
+                                    Citește pe Mayo Clinic
+                                </MudButton>
                             </div>
                         </MudListItem>
                         <MudDivider />
@@ -50,7 +62,13 @@
                             <MudText Typo="Typo.h6">Beneficiile exercițiilor fizice pentru sănătatea mentală</MudText>
                             <MudText Typo="Typo.body2" Class="mt-1">Exercițiile fizice regulate pot îmbunătăți semnificativ starea de spirit.</MudText>
                             <div class="d-flex justify-end mt-2">
-                                <MudButton Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ReadMore">Citește mai mult</MudButton>
+                                <MudButton Variant="Variant.Text" 
+                                         Color="Color.Primary" 
+                                         EndIcon="@Icons.Material.Filled.Launch"
+                                         Href="https://www.helpguide.org/articles/healthy-living/the-mental-health-benefits-of-exercise.htm"
+                                         Target="_blank">
+                                    Citește pe HelpGuide
+                                </MudButton>
                             </div>
                         </MudListItem>
                     </MudList>
@@ -74,7 +92,13 @@
                             <MudText Typo="Typo.h6">Exerciții de respirație</MudText>
                             <MudText Typo="Typo.body2" Class="mt-1">Tehnici simple de respirație pentru reducerea anxietății.</MudText>
                             <div class="d-flex justify-end mt-2">
-                                <MudButton Variant="Variant.Text" Color="Color.Secondary" EndIcon="@Icons.Material.Filled.PlayArrow">Încearcă acum</MudButton>
+                                <MudButton Variant="Variant.Text" 
+                                         Color="Color.Secondary" 
+                                         EndIcon="@Icons.Material.Filled.PlayArrow"
+                                         Href="https://www.youtube.com/watch?v=1Dv-ldGLnIY"
+                                         Target="_blank">
+                                    Urmărește exercițiile
+                                </MudButton>
                             </div>
                         </MudListItem>
                         <MudDivider />
@@ -82,7 +106,13 @@
                             <MudText Typo="Typo.h6">Meditație ghidată</MudText>
                             <MudText Typo="Typo.body2" Class="mt-1">Meditație ghidată pentru relaxare și reducerea stresului.</MudText>
                             <div class="d-flex justify-end mt-2">
-                                <MudButton Variant="Variant.Text" Color="Color.Secondary" EndIcon="@Icons.Material.Filled.PlayArrow">Încearcă acum</MudButton>
+                                <MudButton Variant="Variant.Text" 
+                                         Color="Color.Secondary" 
+                                         EndIcon="@Icons.Material.Filled.PlayArrow"
+                                         Href="https://www.youtube.com/watch?v=O-6f5wQXSu8"
+                                         Target="_blank">
+                                    Începe meditația
+                                </MudButton>
                             </div>
                         </MudListItem>
                         <MudDivider />
@@ -90,7 +120,13 @@
                             <MudText Typo="Typo.h6">Jurnal de recunoștință</MudText>
                             <MudText Typo="Typo.body2" Class="mt-1">Exerciții pentru dezvoltarea unei atitudini de recunoștință.</MudText>
                             <div class="d-flex justify-end mt-2">
-                                <MudButton Variant="Variant.Text" Color="Color.Secondary" EndIcon="@Icons.Material.Filled.PlayArrow">Încearcă acum</MudButton>
+                                <MudButton Variant="Variant.Text" 
+                                         Color="Color.Secondary" 
+                                         EndIcon="@Icons.Material.Filled.PlayArrow"
+                                         Href="https://www.youtube.com/watch?v=WPPPFqsECz0"
+                                         Target="_blank">
+                                    Începe exercițiul
+                                </MudButton>
                             </div>
                         </MudListItem>
                     </MudList>
@@ -115,7 +151,15 @@
                                 <div class="d-flex flex-column">
                                     <MudText Typo="Typo.h6">Linia telefonică de urgență pentru sănătate mentală</MudText>
                                     <MudText Typo="Typo.body1" Class="mt-2">Apel gratuit, disponibil 24/7</MudText>
-                                    <MudText Typo="Typo.h6" Class="mt-2"><MudIcon Icon="@Icons.Material.Filled.Phone" Class="mr-2" /> 0800 123 456</MudText>
+                                    <MudText Typo="Typo.h6" Class="mt-2">
+                                        <MudIcon Icon="@Icons.Material.Filled.Phone" Class="mr-2" />
+                                        <MudLink Href="tel:0800123456" Color="Color.Info">0800 123 456</MudLink>
+                                    </MudText>
+                                    <MudText Typo="Typo.body2" Class="mt-2">
+                                        <MudLink Href="https://www.telefonulcopilului.ro/" Target="_blank" Color="Color.Info">
+                                            Vizitează site-ul oficial
+                                        </MudLink>
+                                    </MudText>
                                 </div>
                             </MudAlert>
                         </MudItem>
@@ -124,7 +168,31 @@
                                 <div class="d-flex flex-column">
                                     <MudText Typo="Typo.h6">Centrul de consiliere psihologică</MudText>
                                     <MudText Typo="Typo.body1" Class="mt-2">Program: Luni-Vineri, 9:00-17:00</MudText>
-                                    <MudText Typo="Typo.h6" Class="mt-2"><MudIcon Icon="@Icons.Material.Filled.Phone" Class="mr-2" /> 021 123 4567</MudText>
+                                    <MudText Typo="Typo.h6" Class="mt-2">
+                                        <MudIcon Icon="@Icons.Material.Filled.Phone" Class="mr-2" />
+                                        <MudLink Href="tel:0211234567" Color="Color.Info">021 123 4567</MudLink>
+                                    </MudText>
+                                    <MudText Typo="Typo.body2" Class="mt-2">
+                                        <MudLink Href="https://www.anxietyromania.ro/" Target="_blank" Color="Color.Info">
+                                            Vizitează site-ul oficial
+                                        </MudLink>
+                                    </MudText>
+                                </div>
+                            </MudAlert>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudAlert Severity="Severity.Info" Variant="Variant.Filled" Class="mud-elevation-3">
+                                <div class="d-flex flex-column">
+                                    <MudText Typo="Typo.h6">Centrul de Sănătate Mintală</MudText>
+                                    <MudText Typo="Typo.body1" Class="mt-2">Program: Luni-Vineri, 8:00-20:00</MudText>
+                                    <MudText Typo="Typo.h6" Class="mt-2">
+                                        <MudIcon Icon="@Icons.Material.Filled.Phone" Class="mr-2" />
+                                        <MudLink Href="tel:0219876543" Color="Color.Info">021 987 6543</MudLink>
+                                    </MudText>
+                                    <MudText Typo="Typo.body2" Class="mt-2">
+                                        <MudIcon Icon="@Icons.Material.Filled.LocationOn" Class="mr-2" />
+                                        Strada Sănătății nr. 15, Sector 1, București
+                                    </MudText>
                                 </div>
                             </MudAlert>
                         </MudItem>

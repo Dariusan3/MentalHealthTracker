@@ -241,10 +241,10 @@ namespace MentalHealthTracker.Controllers
                             .ToListAsync();
                         
                         // Adăugăm header-e cu informații despre paginare
-                        Response.Headers.Add("X-Total-Count", totalItems.ToString());
-                        Response.Headers.Add("X-Page-Number", "1");
-                        Response.Headers.Add("X-Page-Size", allEntries.Count.ToString());
-                        Response.Headers.Add("X-Total-Pages", "1");
+                        Response.Headers.Append("X-Total-Count", totalItems.ToString());
+                        Response.Headers.Append("X-Page-Number", "1");
+                        Response.Headers.Append("X-Page-Size", allEntries.Count.ToString());
+                        Response.Headers.Append("X-Total-Pages", "1");
                         
                         return allEntries;
                     }
@@ -302,10 +302,10 @@ namespace MentalHealthTracker.Controllers
                         .ToListAsync();
                     
                     // Adăugăm header-e cu informații despre paginare
-                    Response.Headers.Add("X-Total-Count", totalItems.ToString());
-                    Response.Headers.Add("X-Page-Number", pageNumber.ToString());
-                    Response.Headers.Add("X-Page-Size", pageSize.ToString());
-                    Response.Headers.Add("X-Total-Pages", Math.Ceiling((double)totalItems / pageSize).ToString());
+                    Response.Headers.Append("X-Total-Count", totalItems.ToString());
+                    Response.Headers.Append("X-Page-Number", pageNumber.ToString());
+                    Response.Headers.Append("X-Page-Size", pageSize.ToString());
+                    Response.Headers.Append("X-Total-Pages", Math.Ceiling((double)totalItems / pageSize).ToString());
                     
                     return pagedEntries;
                 }
@@ -525,9 +525,9 @@ namespace MentalHealthTracker.Controllers
                 moodEntry.Triggers ??= "";
                 
                 // Adăugăm câteva headere utile pentru diagnosticare
-                Response.Headers.Add("X-MoodEntry-Found", "true");
-                Response.Headers.Add("X-MoodEntry-Date", moodEntry.Date.ToString("yyyy-MM-dd"));
-                Response.Headers.Add("X-MoodEntry-MoodLevel", moodEntry.MoodLevel.ToString());
+                Response.Headers.Append("X-MoodEntry-Found", "true");
+                Response.Headers.Append("X-MoodEntry-Date", moodEntry.Date.ToString("yyyy-MM-dd"));
+                Response.Headers.Append("X-MoodEntry-MoodLevel", moodEntry.MoodLevel.ToString());
                 
                 _logger.LogInformation("GetMoodEntry: Înregistrare găsită pentru ID={Id}, MoodLevel={MoodLevel}, Date={Date}", 
                     id, moodEntry.MoodLevel, moodEntry.Date);

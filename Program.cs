@@ -10,7 +10,6 @@ using MentalHealthTracker.Models;
 using MentalHealthTracker.Areas.Identity;
 using System.Security.Claims;
 using Azure.AI.OpenAI;
-using Azure.Identity;
 using Microsoft.SemanticKernel;
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.SignalR;

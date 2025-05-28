@@ -49,42 +49,101 @@ namespace MentalHealthTracker.Services
             return (true, string.Empty);
         }
 
-        public async Task AddMessageAsync(string role, string content)
+        public async Task<ChatConversation> CreateNewConversationAsync(string title = "Conversație nouă")
         {
             var userId = GetCurrentUserId();
-            if (userId == null) return;
+            if (userId == null) throw new UnauthorizedAccessException("Utilizatorul nu este autentificat.");
+
+            var conversation = new ChatConversation
+            {
+                UserId = userId,
+                Title = title,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _db.ChatConversations.Add(conversation);
+            await _db.SaveChangesAsync();
+            return conversation;
+        }
+
+        public async Task DeleteConversationAsync(int conversationId)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null) throw new UnauthorizedAccessException("Utilizatorul nu este autentificat.");
+
+            var conversation = await _db.ChatConversations
+                .Include(c => c.Messages)
+                .FirstOrDefaultAsync(c => c.Id == conversationId && c.UserId == userId);
+
+            if (conversation != null)
+            {
+                // Șterge toate mesajele asociate conversației
+                _db.ChatMessages.RemoveRange(conversation.Messages);
+                // Șterge conversația
+                _db.ChatConversations.Remove(conversation);
+                await _db.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<ChatConversation>> GetUserConversationsAsync()
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null) return new List<ChatConversation>();
+
+            return await _db.ChatConversations
+                .Where(c => c.UserId == userId)
+                .OrderByDescending(c => c.LastModifiedAt ?? c.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<ChatConversation?> GetConversationWithMessagesAsync(int conversationId)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null) return null;
+
+            return await _db.ChatConversations
+                .Include(c => c.Messages.OrderBy(m => m.Timestamp))
+                .FirstOrDefaultAsync(c => c.Id == conversationId && c.UserId == userId);
+        }
+
+        public async Task AddMessageToConversationAsync(int conversationId, string role, string content)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null) throw new UnauthorizedAccessException("Utilizatorul nu este autentificat.");
+
+            var conversation = await _db.ChatConversations
+                .FirstOrDefaultAsync(c => c.Id == conversationId && c.UserId == userId);
+
+            if (conversation == null) throw new InvalidOperationException("Conversația nu a fost găsită.");
 
             var message = new ChatMessage
             {
                 UserId = userId,
                 Role = role,
-                Content = content
+                Content = content,
+                ConversationId = conversationId,
+                Timestamp = DateTime.UtcNow
             };
+
+            conversation.LastModifiedAt = DateTime.UtcNow;
             _db.ChatMessages.Add(message);
             await _db.SaveChangesAsync();
         }
 
-        public async Task<List<ChatMessage>> GetHistoryAsync(int limit = 20)
+        public async Task UpdateConversationTitleAsync(int conversationId, string newTitle)
         {
             var userId = GetCurrentUserId();
-            if (userId == null) return new List<ChatMessage>();
+            if (userId == null) throw new UnauthorizedAccessException("Utilizatorul nu este autentificat.");
 
-            return await _db.ChatMessages
-                .Where(m => m.UserId == userId)
-                .OrderByDescending(m => m.Timestamp)
-                .Take(limit)
-                .OrderBy(m => m.Timestamp)
-                .ToListAsync();
-        }
+            var conversation = await _db.ChatConversations
+                .FirstOrDefaultAsync(c => c.Id == conversationId && c.UserId == userId);
 
-        public async Task<List<ChatMessage>?> GetChatHistoryForUserAsync(string userId)
-        {
-            return await _db.ChatMessages
-                .Where(m => m.UserId == userId)
-                .OrderByDescending(m => m.Timestamp)
-                .Take(20)
-                .OrderBy(m => m.Timestamp)
-                .ToListAsync();
+            if (conversation != null)
+            {
+                conversation.Title = newTitle;
+                conversation.LastModifiedAt = DateTime.UtcNow;
+                await _db.SaveChangesAsync();
+            }
         }
     }
 } 

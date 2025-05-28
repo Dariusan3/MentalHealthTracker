@@ -372,14 +372,23 @@
                 Console.WriteLine("Statistici.razor - CalculateStatisticsFromEntries: Nu sunt date pentru calcul");
                 return;
             }
+
+            // Folosim toate înregistrările, deoarece MoodEntry nu are proprietatea IsDeleted
+            var activeEntries = entries;
+            
+            if (!activeEntries.Any())
+            {
+                Console.WriteLine("Statistici.razor - CalculateStatisticsFromEntries: Nu există înregistrări active");
+                return;
+            }
             
             // Creăm un obiect nou pentru statistici
             statistics = new StatisticsViewModel
             {
-                EntriesCount = entries.Count,
-                AverageMood = Math.Round(entries.Average(e => e.MoodLevel), 1),
-                AverageSleepHours = entries.Any(e => e.SleepHours.HasValue) 
-                    ? Math.Round(entries.Where(e => e.SleepHours.HasValue).Average(e => e.SleepHours.GetValueOrDefault()), 1)
+                EntriesCount = activeEntries.Count(),
+                AverageMood = Math.Round(activeEntries.Average(e => e.MoodLevel), 1),
+                AverageSleepHours = activeEntries.Any(e => e.SleepHours.HasValue) 
+                    ? Math.Round(activeEntries.Where(e => e.SleepHours.HasValue).Average(e => e.SleepHours.GetValueOrDefault()), 1)
                     : 0,
                 MoodTrend = new List<MoodTrendItem>(),
                 MostCommonActivities = new List<string>(),
@@ -387,7 +396,7 @@
             };
             
             // Calculăm tendința stării de spirit pentru ultimele 30 de zile
-            var last30Days = entries
+            var last30Days = activeEntries
                 .Where(e => e.Date >= DateTime.Today.AddDays(-30))
                 .GroupBy(e => e.Date.Date)
                 .Select(g => new MoodTrendItem
@@ -404,7 +413,7 @@
             Console.WriteLine($"Statistici.razor - CalculateStatisticsFromEntries: Tendință stare spirit - {last30Days.Count} zile");
             
             // Calculăm activitățile frecvente
-            var activities = entries
+            var activities = activeEntries
                 .Where(e => !string.IsNullOrEmpty(e.Activities))
                 .SelectMany(e => e.Activities.Split(',', StringSplitOptions.RemoveEmptyEntries))
                 .Where(a => !string.IsNullOrEmpty(a))
@@ -420,7 +429,7 @@
             Console.WriteLine($"Statistici.razor - CalculateStatisticsFromEntries: Activități frecvente - {activities.Count} activități");
             
             // Calculăm factorii declanșatori frecvenți
-            var triggers = entries
+            var triggers = activeEntries
                 .Where(e => !string.IsNullOrEmpty(e.Triggers))
                 .SelectMany(e => e.Triggers.Split(',', StringSplitOptions.RemoveEmptyEntries))
                 .Where(t => !string.IsNullOrEmpty(t))

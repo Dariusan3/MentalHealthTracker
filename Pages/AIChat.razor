@@ -1,5 +1,6 @@
 @page "/aichat"
 @using MentalHealthTracker.Services
+@using MentalHealthTracker.Models
 @using MudBlazor
 @inject AIChatService AIChatService
 @inject ChatHistoryService ChatHistoryService
@@ -11,55 +12,228 @@
 
 <PageTitle>Chat AI</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
-    <MudText Typo="Typo.h4" Align="Align.Center" GutterBottom="true">Chat cu AI (local)</MudText>
-    <MudPaper Elevation="2" Class="pa-4 mb-4" Style="min-height: 400px;">
-        <div style="overflow-y:auto; max-height:300px;">
-            @foreach (var msg in Messages)
-            {
-                <MudText Typo="Typo.body1" Color="@(msg.role=="user" ? Color.Primary : Color.Secondary)"><b>@(msg.role=="user" ? "Tu:" : "AI:")</b> @msg.content</MudText>
-            }
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <div class="d-flex justify-space-between align-center mb-4">
+        <MudText Typo="Typo.h4">Chat cu AI (local)</MudText>
+        <div class="d-flex gap-2">
+            <MudButton Variant="Variant.Outlined" 
+                      Color="Color.Error" 
+                      StartIcon="@Icons.Material.Filled.Delete"
+                      OnClick="OpenDeleteDialog"
+                      Disabled="@(Conversations.Count == 0)">
+                Șterge conversația
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" 
+                      Color="Color.Primary" 
+                      StartIcon="@Icons.Material.Filled.Add"
+                      OnClick="CreateNewChat">
+                Conversație nouă
+            </MudButton>
         </div>
-        <MudDivider Class="my-2" />
-        <MudTextField @bind-Value="UserInput" Placeholder="Scrie un mesaj..." FullWidth="true" OnKeyDown="OnKeyDown" Disabled="@IsStreaming" />
-        <MudButton OnClick="SendMessage" Disabled="@DisabledButton" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2">Trimite</MudButton>
-        
-        @if (!string.IsNullOrEmpty(ErrorMessage))
+    </div>
+
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" Class="mb-4" @bind-ActivePanelIndex="ActiveTabIndex">
+        @foreach (var conversation in Conversations)
         {
-            <MudAlert Severity="Severity.Warning" Class="mt-3">
-                @ErrorMessage
-                @if (ErrorMessage.Contains("limita zilnică"))
-                {
-                    <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="GoToSubscription" Class="ml-2">
-                        Abonează-te acum
-                    </MudButton>
-                }
-            </MudAlert>
+            <MudTabPanel Text="@conversation.Title" Icon="@Icons.Material.Filled.Chat">
+                <MudPaper Elevation="2" Class="pa-4" Style="min-height: 400px;">
+                    <div style="overflow-y:auto; max-height:400px;" class="mb-4">
+                        @foreach (var msg in conversation.Messages.OrderBy(m => m.Timestamp))
+                        {
+                            <MudPaper Elevation="0" 
+                                     Class="@GetMessageClass(msg.Role)" 
+                                     Style="border-radius: 8px; margin-bottom: 8px; padding: 12px;">
+                                <div class="d-flex align-center mb-2">
+                                    <MudIcon Icon="@(msg.Role == "user" ? Icons.Material.Filled.Person : Icons.Material.Filled.SmartToy)" 
+                                            Color="@(msg.Role == "user" ? Color.Primary : Color.Secondary)"
+                                            Class="mr-2" />
+                                    <MudText Typo="Typo.body1" 
+                                            Color="@(msg.Role == "user" ? Color.Primary : Color.Secondary)">
+                                        <b>@(msg.Role == "user" ? "Tu:" : "AI:")</b>
+                                    </MudText>
+                                    <MudText Typo="Typo.caption" Class="ml-auto" Color="Color.Secondary">
+                                        @msg.Timestamp.ToLocalTime().ToString("HH:mm")
+                                    </MudText>
+                                </div>
+                                <MudText Typo="Typo.body1" Class="ml-6" Style="white-space: pre-wrap;">@msg.Content</MudText>
+                            </MudPaper>
+                        }
+                    </div>
+                    <MudDivider Class="my-2" />
+                    <div class="d-flex gap-2">
+                        <MudTextField @bind-Value="UserInput" 
+                                    Placeholder="Scrie un mesaj..." 
+                                    FullWidth="true" 
+                                    OnKeyDown="OnKeyDown" 
+                                    Disabled="@IsStreaming"
+                                    Variant="Variant.Outlined"
+                                    Class="flex-grow-1" />
+                        <MudButton OnClick="SendMessage" 
+                                 Disabled="@DisabledButton" 
+                                 Variant="Variant.Filled" 
+                                 Color="Color.Primary"
+                                 StartIcon="@Icons.Material.Filled.Send">
+                            Trimite
+                        </MudButton>
+                    </div>
+                    
+                    @if (!string.IsNullOrEmpty(ErrorMessage))
+                    {
+                        <MudAlert Severity="Severity.Warning" Class="mt-3">
+                            @ErrorMessage
+                            @if (ErrorMessage.Contains("limita zilnică"))
+                            {
+                                <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="GoToSubscription" Class="ml-2">
+                                    Abonează-te acum
+                                </MudButton>
+                            }
+                        </MudAlert>
+                    }
+                </MudPaper>
+            </MudTabPanel>
         }
-        
-        <MudText>@Response</MudText>
-    </MudPaper>
+    </MudTabs>
 </MudContainer>
 
+<MudDialog @bind-IsVisible="ShowDeleteDialog" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">Ștergere conversație</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText>Sigur doriți să ștergeți conversația curentă?</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CloseDeleteDialog">Anulează</MudButton>
+        <MudButton Color="Color.Error" OnClick="DeleteCurrentChat">Șterge</MudButton>
+    </DialogActions>
+</MudDialog>
+
 @code {
-    private List<(string role, string content)> Messages = new();
+    private List<ChatConversation> Conversations = new();
     private string UserInput = string.Empty;
     private bool IsStreaming = false;
     private string CurrentStreaming = string.Empty;
     private string Response = string.Empty;
     private string ErrorMessage = string.Empty;
+    private bool ShowDeleteDialog = false;
+    private int ActiveTabIndex = 0;
+
+    private DialogOptions dialogOptions = new()
+    {
+        CloseButton = true,
+        MaxWidth = MaxWidth.ExtraSmall,
+        FullWidth = true
+    };
 
     private bool DisabledButton => IsStreaming || string.IsNullOrWhiteSpace(UserInput);
 
+    private string GetMessageClass(string role)
+    {
+        return role == "user" 
+            ? "pa-2 bg-primary-lighten" 
+            : "pa-2 bg-secondary-lighten";
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        var history = await ChatHistoryService.GetHistoryAsync();
-        foreach (var msg in history)
+        try
         {
-            Messages.Add((msg.Role, msg.Content));
+            await LoadConversations();
+            await NotificationService.StartAsync();
+            NotificationService.OnNotificationReceived += ShowNotification;
         }
-        await NotificationService.StartAsync();
-        NotificationService.OnNotificationReceived += ShowNotification;
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Eroare la inițializare: {ex.Message}");
+            Snackbar.Add("A apărut o eroare la încărcarea conversațiilor", Severity.Error);
+        }
+    }
+
+    private async Task LoadConversations()
+    {
+        try
+        {
+            Conversations = await ChatHistoryService.GetUserConversationsAsync();
+            
+            // Încarcă mesajele pentru fiecare conversație
+            foreach (var conversation in Conversations)
+            {
+                var fullConversation = await ChatHistoryService.GetConversationWithMessagesAsync(conversation.Id);
+                if (fullConversation != null)
+                {
+                    conversation.Messages = fullConversation.Messages;
+                }
+            }
+
+            if (Conversations.Count == 0)
+            {
+                await CreateNewChat();
+            }
+            else
+            {
+                // Selectează ultima conversație activă
+                ActiveTabIndex = 0;
+            }
+            
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Eroare la încărcarea conversațiilor: {ex.Message}");
+            Snackbar.Add("A apărut o eroare la încărcarea conversațiilor", Severity.Error);
+        }
+    }
+
+    private async Task CreateNewChat()
+    {
+        var conversation = await ChatHistoryService.CreateNewConversationAsync();
+        Conversations.Add(conversation);
+        ActiveTabIndex = Conversations.Count - 1;
+        StateHasChanged();
+    }
+
+    private void OpenDeleteDialog()
+    {
+        ShowDeleteDialog = true;
+    }
+
+    private void CloseDeleteDialog()
+    {
+        ShowDeleteDialog = false;
+    }
+
+    private async Task DeleteCurrentChat()
+    {
+        try
+        {
+            if (Conversations.Count > 0)
+            {
+                var conversationToDelete = Conversations[ActiveTabIndex];
+                await ChatHistoryService.DeleteConversationAsync(conversationToDelete.Id);
+                Conversations.RemoveAt(ActiveTabIndex);
+                
+                if (Conversations.Count == 0)
+                {
+                    await CreateNewChat();
+                }
+                else
+                {
+                    ActiveTabIndex = Math.Min(ActiveTabIndex, Conversations.Count - 1);
+                }
+                
+                Snackbar.Add("Conversația a fost ștearsă cu succes", Severity.Success);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("A apărut o eroare la ștergerea conversației", Severity.Error);
+            Console.WriteLine($"Eroare la ștergerea conversației: {ex.Message}");
+        }
+        finally
+        {
+            CloseDeleteDialog();
+            StateHasChanged();
+        }
     }
 
     private void ShowNotification(string message)
@@ -70,6 +244,9 @@
     private async Task SendMessage()
     {
         if (string.IsNullOrWhiteSpace(UserInput)) return;
+
+        var currentConversation = Conversations[ActiveTabIndex];
+        if (currentConversation == null) return;
 
         // Verifică dacă utilizatorul poate trimite un mesaj
         var (isAllowed, errorMessage) = await ChatHistoryService.CanUserSendMessageAsync();
@@ -82,9 +259,8 @@
         ErrorMessage = string.Empty;
 
         // Salvează mesajul userului
-        await ChatHistoryService.AddMessageAsync("user", UserInput);
+        await ChatHistoryService.AddMessageToConversationAsync(currentConversation.Id, "user", UserInput);
 
-        Messages.Add(("user", UserInput));
         var localInput = UserInput;
         UserInput = string.Empty;
         IsStreaming = true;
@@ -94,9 +270,15 @@
         Response = await AIChatService.GetChatResponseOllamaAsync(localInput, ServiceProvider);
 
         // Salvează răspunsul AI
-        await ChatHistoryService.AddMessageAsync("assistant", Response);
+        await ChatHistoryService.AddMessageToConversationAsync(currentConversation.Id, "assistant", Response);
 
-        Messages.Add(("assistant", Response));
+        // Reîncarcă conversația pentru a afișa noile mesaje
+        var updatedConversation = await ChatHistoryService.GetConversationWithMessagesAsync(currentConversation.Id);
+        if (updatedConversation != null)
+        {
+            Conversations[ActiveTabIndex] = updatedConversation;
+        }
+
         IsStreaming = false;
         StateHasChanged();
     }
@@ -112,5 +294,13 @@
     private void GoToSubscription()
     {
         NavigationManager.NavigateTo("/subscription");
+    }
+
+    public void Dispose()
+    {
+        if (NotificationService != null)
+        {
+            NotificationService.OnNotificationReceived -= ShowNotification;
+        }
     }
 }
