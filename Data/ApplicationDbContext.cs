@@ -12,6 +12,8 @@ namespace MentalHealthTracker.Data
         }
 
         public DbSet<MoodEntry> MoodEntries { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

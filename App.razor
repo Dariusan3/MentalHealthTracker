@@ -3,33 +3,21 @@
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.JSInterop
 @using System.Threading.Tasks
+@using Microsoft.AspNetCore.Identity
+@using MentalHealthTracker.Models
+@using System.Security.Claims
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider AuthStateProvider
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
 
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
-                <NotAuthorized>
-                    @if (context.User.Identity?.IsAuthenticated != true)
-                    {
-                        <RedirectToLogin />
-                    }
-                    else
-                    {
-                        <p class="alert alert-danger">Nu aveți permisiunea de a accesa această resursă.</p>
-                    }
-                </NotAuthorized>
-                <Authorizing>
-                    <div class="d-flex justify-content-center mt-5">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Se verifică autorizarea...</span>
-                        </div>
-                    </div>
-                </Authorizing>
-            </AuthorizeRouteView>
+            @* Folosim RouteView standard și lăsăm paginile individuale să gestioneze autorizarea *@
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         </Found>
         <NotFound>
             <PageTitle>Pagină negăsită</PageTitle>
@@ -43,52 +31,23 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
-        
-        // Verificăm starea de autentificare la inițializarea aplicației
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
-        var userName = authState.User.Identity?.Name ?? "";
-        
-        Console.WriteLine($"App.razor OnInitializedAsync: Autentificat: {isAuthenticated}, Utilizator: {userName}");
-        
-        // Configurăm interceptorul pentru cereri HTTP
-        await JSRuntime.InvokeVoidAsync("configureHttpInterceptor");
-    }
-    
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
+        // Permite circuitului Blazor să se inițializeze și să randeze componenta inițială
+        await Task.Yield();
+
+        // Am eliminat logica complexă de verificare a utilizatorului în baza de date și deconectare de aici.
+        // Ne bazăm pe comportamentul implicit al sistemului de autentificare
+        // și pe atributul [Authorize] de pe paginile individuale.
+
+        // Configurăm interceptorul pentru cereri HTTP (dacă este încă necesar)
+        try
         {
-            try
-            {
-                // Verificăm starea de autentificare la încărcarea aplicației
-                await JSRuntime.InvokeVoidAsync("checkAuthStatus");
-                
-                Console.WriteLine("App.razor: Verificare autentificare efectuată");
-                
-                // Sincronizăm starea de autentificare din localStorage
-                await JSRuntime.InvokeVoidAsync("syncAuthStateFromLocalStorage");
-                Console.WriteLine("App.razor: Sincronizare autentificare din localStorage efectuată");
-                
-                // Forțăm revalidarea stării de autentificare
-                if (AuthStateProvider is MentalHealthTracker.Areas.Identity.RevalidatingIdentityAuthenticationStateProvider<MentalHealthTracker.Models.ApplicationUser> revalidatingProvider)
-                {
-                    revalidatingProvider.ForceRevalidate();
-                    Console.WriteLine("App.razor: Forțare revalidare stare autentificare");
-                }
-                
-                // Verificăm starea de autentificare după sincronizare
-                var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-                var isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
-                var userName = authState.User.Identity?.Name ?? "";
-                
-                Console.WriteLine($"OnAfterRenderAsync: Autentificat: {isAuthenticated}, Utilizator: {userName}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"App.razor: Eroare la verificarea autentificării: {ex.Message}");
-            }
+             await JSRuntime.InvokeVoidAsync("configureHttpInterceptor");
+        }
+        catch (Exception ex)
+        {
+             Console.WriteLine($"Eroare la configurarea interceptorului HTTP în App.razor: {ex.Message}");
         }
     }
+    
+    // Logica OnAfterRenderAsync poate fi păstrată dacă este necesară pentru sincronizarea JS inițială.
 }

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/MentalHealthTracker.csproj": {}
+    "/Users/osadici.darius/Documents/sem2/PDN/Proiect2/MentalHealthTracker/MentalHealthTracker.csproj": {}
   },
   "projects": {
-    "/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/MentalHealthTracker.csproj": {
+    "/Users/osadici.darius/Documents/sem2/PDN/Proiect2/MentalHealthTracker/MentalHealthTracker.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/MentalHealthTracker.csproj",
+        "projectUniqueName": "/Users/osadici.darius/Documents/sem2/PDN/Proiect2/MentalHealthTracker/MentalHealthTracker.csproj",
         "projectName": "MentalHealthTracker",
-        "projectPath": "/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/MentalHealthTracker.csproj",
+        "projectPath": "/Users/osadici.darius/Documents/sem2/PDN/Proiect2/MentalHealthTracker/MentalHealthTracker.csproj",
         "packagesPath": "/Users/osadici.darius/.nuget/packages/",
-        "outputPath": "/Users/osadici.darius/Documents/sem2/PDN/Proiect/MentalHealthTracker/obj/",
+        "outputPath": "/Users/osadici.darius/Documents/sem2/PDN/Proiect2/MentalHealthTracker/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/osadici.darius/.nuget/NuGet/NuGet.Config"
@@ -45,6 +45,10 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "dependencies": {
+            "Azure.Core": {
+              "target": "Package",
+              "version": "[1.46.1, )"
+            },
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
               "target": "Package",
               "version": "[7.0.0, )"
@@ -58,6 +62,14 @@
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[7.0.0, )"
+            },
+            "Microsoft.SemanticKernel": {
+              "target": "Package",
+              "version": "[1.48.0, )"
+            },
+            "Microsoft.SemanticKernel.Connectors.AzureAIInference": {
+              "target": "Package",
+              "version": "[1.48.0-beta, )"
             },
             "MudBlazor": {
               "target": "Package",

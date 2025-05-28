@@ -274,6 +274,61 @@ namespace MentalHealthTracker.Controllers
                 return Redirect("/?eroare=true&t=" + DateTime.Now.Ticks);
             }
         }
+
+        [HttpPost("delete")]
+        [Authorize] // Doar utilizatorii autentificați pot șterge contul
+        public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountRequest model)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                // Ar trebui să fie autentificat datorită [Authorize], dar verificăm pentru siguranță
+                return Unauthorized(new { success = false, message = "Utilizatorul nu este autentificat." });
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                // Contul nu există în baza de date (deși utilizatorul pare autentificat)
+                _logger.LogWarning("Încercare de ștergere cont pentru un utilizator inexistent (ID: {UserId})", userId);
+                // Poate forțăm o deconectare aici?
+                await _signInManager.SignOutAsync();
+                return Unauthorized(new { success = false, message = "Contul nu există." });
+            }
+
+            // Verificăm parola curentă pentru confirmare
+            var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, model.CurrentPassword);
+            if (!isPasswordCorrect)
+            {
+                return BadRequest(new { success = false, message = "Parola curentă este incorectă." });
+            }
+
+            // Ștergem utilizatorul
+            var deleteResult = await _userManager.DeleteAsync(user);
+
+            if (deleteResult.Succeeded)
+            {
+                 _logger.LogInformation("Cont șters cu succes pentru utilizatorul {Email} (ID: {UserId})", user.Email, user.Id);
+
+                // Deconectăm utilizatorul după ștergere
+                await _signInManager.SignOutAsync();
+
+                // Returnăm un răspuns HTTP de redirecționare către pagina de login
+                return Redirect("/account/login");
+            }
+            else
+            {
+                var errors = string.Join(", ", deleteResult.Errors.Select(e => e.Description));
+                _logger.LogError("Eroare la ștergerea contului pentru utilizatorul {Email} (ID: {UserId}): {Errors}", user.Email, user.Id, errors);
+                return StatusCode(500, new { success = false, message = "Eroare la ștergerea contului", errors = errors });
+            }
+        }
+
+        // Adăugăm o clasă model pentru request-ul de ștergere cont
+        public class DeleteAccountRequest
+        {
+            public string CurrentPassword { get; set; } = "";
+        }
     }
 
     public class LoginRequest

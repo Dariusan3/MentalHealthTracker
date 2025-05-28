@@ -1,7 +1,17 @@
 @page "/profil"
 @using MudBlazor
+@using MudBlazor.Dialog
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@using MentalHealthTracker.Models
+@using MentalHealthTracker.Services
 @inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
+@inject UserProfileService UserProfileService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
 @attribute [Authorize]
 
 <PageTitle>Mental Health Tracker - Profil</PageTitle>
@@ -30,9 +40,12 @@
                     </CardHeaderActions>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudTextField T="string" Label="Nume" Variant="Variant.Outlined" Value="@nume" Class="mt-3" />
-                    <MudTextField T="string" Label="Email" Variant="Variant.Outlined" Value="@email" Class="mt-3" />
-                    <MudDatePicker Label="Data nașterii" Variant="Variant.Outlined" Date="@dataNasterii" Class="mt-3" />
+                    @if (userProfile != null)
+                    {
+                        <MudTextField @bind-Value="@userProfile.Nume" Label="Nume" Variant="Variant.Outlined" Class="mt-3" />
+                        <MudTextField @bind-Value="@userProfile.Email" Label="Email" Variant="Variant.Outlined" Class="mt-3" />
+                        <MudDatePicker @bind-Date="@userProfile.DataNasterii" Label="Data nașterii" Variant="Variant.Outlined" Class="mt-3" />
+                    }
                 </MudCardContent>
                 <MudCardActions>
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@SalveazaModificari">Salvează modificările</MudButton>
@@ -51,14 +64,17 @@
                     </CardHeaderActions>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudSwitch @bind-Value="@notificariZilnice" Color="Color.Primary" Label="Primește notificări zilnice" Class="mt-3" />
-                    <MudSwitch @bind-Value="@rapoarteSaptamanale" Color="Color.Primary" Label="Primește rapoarte săptămânale" Class="mt-3" />
-                    <MudTimePicker Label="Ora notificării zilnice" Variant="Variant.Outlined" Time="@oraNotificare" Class="mt-3" />
-                    <MudSelect T="string" Label="Tema aplicației" Variant="Variant.Outlined" Value="@tema" Class="mt-3">
-                        <MudSelectItem Value="@("light")">Luminoasă</MudSelectItem>
-                        <MudSelectItem Value="@("dark")">Întunecată</MudSelectItem>
-                        <MudSelectItem Value="@("auto")">Automată (bazată pe setările sistemului)</MudSelectItem>
-                    </MudSelect>
+                    @if (userProfile != null)
+                    {
+                        <MudSwitch @bind-Value="@userProfile.NotificariZilnice" Color="Color.Primary" Label="Primește notificări zilnice" Class="mt-3" />
+                        <MudSwitch @bind-Value="@userProfile.RapoarteSaptamanale" Color="Color.Primary" Label="Primește rapoarte săptămânale" Class="mt-3" />
+                        <MudTimePicker @bind-Time="@userProfile.OraNotificare" Label="Ora notificării zilnice" Variant="Variant.Outlined" Class="mt-3" />
+                        <MudSelect T="string" @bind-Value="@userProfile.Tema" Label="Tema aplicației" Variant="Variant.Outlined" Class="mt-3">
+                            <MudSelectItem Value='@("light")'>Luminoasă</MudSelectItem>
+                            <MudSelectItem Value='@("dark")'>Întunecată</MudSelectItem>
+                            <MudSelectItem Value='@("auto")'>Automată (bazată pe setările sistemului)</MudSelectItem>
+                        </MudSelect>
+                    }
                 </MudCardContent>
                 <MudCardActions>
                     <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@SalveazaPreferinte">Salvează preferințele</MudButton>
@@ -77,65 +93,145 @@
                     </CardHeaderActions>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudTextField T="string" Label="Parola actuală" Variant="Variant.Outlined" InputType="@passwordInputType" Adornment="Adornment.End" AdornmentIcon="@passwordIcon" OnAdornmentClick="@TogglePasswordVisibility" Class="mt-3" />
-                    <MudTextField T="string" Label="Parola nouă" Variant="Variant.Outlined" InputType="@passwordInputType" Adornment="Adornment.End" AdornmentIcon="@passwordIcon" OnAdornmentClick="@TogglePasswordVisibility" Class="mt-3" />
-                    <MudTextField T="string" Label="Confirmă parola nouă" Variant="Variant.Outlined" InputType="@passwordInputType" Adornment="Adornment.End" AdornmentIcon="@passwordIcon" OnAdornmentClick="@TogglePasswordVisibility" Class="mt-3" />
+                    <MudTextField T="string" Label="Parola actuală" Variant="Variant.Outlined" InputType="@passwordInputType" Adornment="Adornment.End" AdornmentIcon="@passwordIcon" OnAdornmentClick="@TogglePasswordVisibility" Class="mt-3" @bind-Value="@currentPassword" />
+                    <MudTextField T="string" Label="Parola nouă" Variant="Variant.Outlined" InputType="@passwordInputType" Adornment="Adornment.End" AdornmentIcon="@passwordIcon" OnAdornmentClick="@TogglePasswordVisibility" Class="mt-3" @bind-Value="@newPassword" />
+                    <MudTextField T="string" Label="Confirmă parola nouă" Variant="Variant.Outlined" InputType="@passwordInputType" Adornment="Adornment.End" AdornmentIcon="@passwordIcon" OnAdornmentClick="@TogglePasswordVisibility" Class="mt-3" @bind-Value="@confirmNewPassword" />
                 </MudCardContent>
                 <MudCardActions>
                     <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@SchimbaParola">Schimbă parola</MudButton>
                 </MudCardActions>
             </MudCard>
         </MudItem>
-        
-        <MudItem xs="12" Class="mt-4">
-            <MudPaper Elevation="3" Class="pa-4 rounded-lg">
-                <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Class="mb-4">
-                    <MudText>Atenție! Acțiunile de mai jos sunt ireversibile.</MudText>
-                </MudAlert>
-                <MudButton Variant="Variant.Filled" Color="Color.Error" FullWidth="true" OnClick="@ShowDeleteDialog">
-                    Șterge contul meu
-                </MudButton>
-            </MudPaper>
-        </MudItem>
     </MudGrid>
 </MudContainer>
 
 @code {
-    private string nume = "Utilizator Demo";
-    private string email = "utilizator@example.com";
-    private DateTime? dataNasterii = new DateTime(1990, 1, 1);
-    
-    private bool notificariZilnice = true;
-    private bool rapoarteSaptamanale = true;
-    private TimeSpan? oraNotificare = new TimeSpan(20, 0, 0);
-    private string tema = "light";
-    
+    private UserProfile? userProfile;
+    private ApplicationUser? currentUser;
+
+    private string currentPassword = "";
+    private string newPassword = "";
+    private string confirmNewPassword = "";
+
     private bool isPasswordVisible = false;
     private InputType passwordInputType => isPasswordVisible ? InputType.Text : InputType.Password;
     private string passwordIcon => isPasswordVisible ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user?.Identity?.IsAuthenticated == true)
+        {
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId != null)
+            {
+                // Nu mai verificăm existența utilizatorului în baza de date aici.
+                // Aceasta se face la nivel global în App.razor.
+
+                currentUser = await UserManager.FindByIdAsync(userId);
+
+                if (currentUser != null)
+                {
+                    userProfile = await UserProfileService.GetUserProfileAsync(currentUser.Id);
+                    if (userProfile == null)
+                    {
+                        userProfile = new UserProfile 
+                        { 
+                            UserId = currentUser.Id, 
+                            Nume = currentUser.UserName ?? "", 
+                            Email = currentUser.Email ?? "",
+                            DataNasterii = null // Inițializează DataNasterii la null pentru un profil nou
+                        };
+                        await UserProfileService.CreateOrUpdateProfileAsync(userProfile);
+                    }
+                }
+                else
+                {
+                     // Acest caz ar trebui gestionat deja de App.razor, dar adăugăm un fallback.
+                    Console.WriteLine("Profil.razor: Utilizator autentificat, dar currentUser este null. Redirecționare la login.");
+                    NavigationManager.NavigateTo("/account/login", forceLoad: true);
+                }
+            }
+            else
+            {
+                // Acest caz ar trebui gestionat deja de App.razor, dar adăugăm un fallback.
+                Console.WriteLine("Profil.razor: Utilizator autentificat, dar fără ID claim. Redirecționare la login.");
+                NavigationManager.NavigateTo("/account/login", forceLoad: true);
+            }
+        }
+        else
+        {
+            // Utilizatorul nu este autentificat - redirecționare la login
+            Console.WriteLine("Profil.razor: Utilizator neautentificat. Redirecționare la login.");
+            NavigationManager.NavigateTo("/account/login", forceLoad: true);
+        }
+    }
+
+    private async Task SalveazaModificari()
+    {
+        if (userProfile != null)
+        {
+            userProfile.UltimaActualizare = DateTime.UtcNow;
+            await UserProfileService.CreateOrUpdateProfileAsync(userProfile);
+            Snackbar.Add("Informații personale salvate cu succes!", Severity.Success);
+        }
+        else
+        {
+             Snackbar.Add("Eroare la salvarea informațiilor personale.", Severity.Error);
+        }
+    }
     
+    private async Task SalveazaPreferinte()
+    {
+         if (userProfile != null)
+        {
+            userProfile.UltimaActualizare = DateTime.UtcNow;
+            await UserProfileService.CreateOrUpdateProfileAsync(userProfile);
+            Snackbar.Add("Preferințe salvate cu succes!", Severity.Success);
+        }
+         else
+        {
+            Snackbar.Add("Eroare la salvarea preferințelor.", Severity.Error);
+        }
+    }
+    
+    private async Task SchimbaParola()
+    {
+        if (currentUser == null) return;
+
+        if (string.IsNullOrWhiteSpace(currentPassword) || string.IsNullOrWhiteSpace(newPassword) || string.IsNullOrWhiteSpace(confirmNewPassword))
+        {
+            Snackbar.Add("Toate câmpurile parolei sunt obligatorii.", Severity.Warning);
+            return;
+        }
+
+        if (newPassword != confirmNewPassword)
+        {
+            Snackbar.Add("Noua parolă și confirmarea parolei nu coincid.", Severity.Warning);
+            return;
+        }
+
+        var changePasswordResult = await UserManager.ChangePasswordAsync(currentUser, currentPassword, newPassword);
+
+        if (changePasswordResult.Succeeded)
+        {
+            Snackbar.Add("Parola schimbată cu succes!", Severity.Success);
+            currentPassword = string.Empty;
+            newPassword = string.Empty;
+            confirmNewPassword = string.Empty;
+        }
+        else
+        {
+            var errors = string.Join(", ", changePasswordResult.Errors.Select(e => e.Description));
+            Snackbar.Add($"Eroare la schimbarea parolei: {errors}", Severity.Error);
+        }
+    }
+
     private void TogglePasswordVisibility()
     {
         isPasswordVisible = !isPasswordVisible;
-    }
-    
-    private void SalveazaModificari()
-    {
-        Snackbar.Add("Modificări salvate!", Severity.Success);
-    }
-    
-    private void SalveazaPreferinte()
-    {
-        Snackbar.Add("Preferințe salvate!", Severity.Success);
-    }
-    
-    private void SchimbaParola()
-    {
-        Snackbar.Add("Parola schimbată cu succes!", Severity.Success);
-    }
-    
-    private void ShowDeleteDialog()
-    {
-        Snackbar.Add("Funcționalitate în dezvoltare", Severity.Info);
     }
 } 

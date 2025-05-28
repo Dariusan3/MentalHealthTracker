@@ -9,6 +9,10 @@ using MentalHealthTracker.Services;
 using MentalHealthTracker.Models;
 using MentalHealthTracker.Areas.Identity;
 using System.Security.Claims;
+using Azure.AI.OpenAI;
+using Azure.Identity;
+using Microsoft.SemanticKernel;
+using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +20,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
+
+// // AI setup
+// builder.Services.AddKernel();
+// var aiConfig = builder.Configuration.GetSection("AIChat");
+// builder.Services.AddAzureOpenAIChatCompletion(
+//     deploymentName: aiConfig["DeploymentName"],
+//     endpoint: aiConfig["Endpoint"],
+//     new DefaultAzureCredential()
+// );
 
 // Adăugăm un CookieContainer partajat pentru toate instanțele HttpClient
 var cookieContainer = new System.Net.CookieContainer();
@@ -114,6 +127,9 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 // Adăugare servicii aplicație
 builder.Services.AddScoped<MoodService>();
+builder.Services.AddSingleton<AIChatService>();
+builder.Services.AddScoped<ChatHistoryService>();
+builder.Services.AddScoped<UserProfileService>();
 
 var app = builder.Build();
 

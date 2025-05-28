@@ -48,8 +48,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>48tmkg660f</Fingerprint>
-      <Integrity>jA4J4h/k76zVxbFKEaWwFKJccmO0voOQ1DbUW+5YNlI=</Integrity>
+      <Fingerprint>z189sdz1gv</Fingerprint>
+      <Integrity>+Q44zfEaCMmXduni5Td+IgCbk8sSUQwES2nWs+KKQz0=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\open-iconic\FONT-LICENSE'))</OriginalItemSpec>
@@ -120,8 +120,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>sjnzgf7e1h</Fingerprint>
-      <Integrity>+P1oQ5jPzOVJGC52E1oxGXIXxxCyMlqy6A9cNxGYzVk=</Integrity>
+      <Fingerprint>10uzszoped</Fingerprint>
+      <Integrity>oUpLdS+SoLJFwf4bzA3iKD7TCm66oLkTpAQlVJ2s1wc=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\open-iconic\font\fonts\open-iconic.svg'))</OriginalItemSpec>
@@ -174,8 +174,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>4dwjve0o0b</Fingerprint>
-      <Integrity>aF5g/izareSj02F3MPSoTGNbcMBl9nmZKDe04zjU/ss=</Integrity>
+      <Fingerprint>3cg08az021</Fingerprint>
+      <Integrity>s/Is6Ey6jfNAEfXUIOyHrXXX+RcA8hzchYnuOIWUMl4=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\open-iconic\ICON-LICENSE'))</OriginalItemSpec>
@@ -192,8 +192,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>5bzwdl5l6x</Fingerprint>
-      <Integrity>waukoLqsiIAw/nXpsKkTHnhImmcPijcBEd2lzqzJNN0=</Integrity>
+      <Fingerprint>9ecj4fqnpz</Fingerprint>
+      <Integrity>f7rXj2KSx8rOrKHjkkyN+tLJV5mfHEDVLGIZvcj/hgg=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\open-iconic\README.md'))</OriginalItemSpec>
@@ -210,8 +210,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>zh9s866nx2</Fingerprint>
-      <Integrity>Fx+c1youNLgejKLBM3S2fD6fcDOSv/D7tNQKm5gws6U=</Integrity>
+      <Fingerprint>69lzu0n0bb</Fingerprint>
+      <Integrity>WqQ7CoPrf4spNXN+bTm4CWMuNKblQ/ddzNWpOgJwCus=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</OriginalItemSpec>

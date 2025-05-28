@@ -1,4 +1,5 @@
 @page "/account/login"
+@page "/"
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
 @using MentalHealthTracker.Models
@@ -7,6 +8,7 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Mental Health Tracker - Autentificare</PageTitle>
 
@@ -87,13 +89,22 @@
     private InputType passwordInputType => isPasswordVisible ? InputType.Text : InputType.Password;
     private string passwordIcon => isPasswordVisible ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility;
     
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        // Verifică dacă utilizatorul este deja autentificat
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            Console.WriteLine("Login.razor: Utilizator deja autentificat. Redirecționare către /home.");
+            NavigationManager.NavigateTo("/home", forceLoad: true);
+            return; // Ieșim din metodă după redirecționare
+        }
+
         // Obținem parametrul returnUrl din query string, dacă există
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         if (Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var returnUrlValues))
         {
-            // Păstrăm returnUrl pentru redirecționare
+            // Păstrăm returnUrl pentru redirecționare (poate fi folosit după autentificarea reușită)
         }
     }
     

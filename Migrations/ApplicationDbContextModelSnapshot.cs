@@ -22,6 +22,34 @@ namespace MentalHealthTracker.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ChatMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChatMessages");
+                });
+
             modelBuilder.Entity("MentalHealthTracker.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -138,6 +166,57 @@ namespace MentalHealthTracker.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("MoodEntries");
+                });
+
+            modelBuilder.Entity("MentalHealthTracker.Models.UserProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DataCreare")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DataNasterii")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("NotificariZilnice")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Nume")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<TimeSpan?>("OraNotificare")
+                        .HasColumnType("time");
+
+                    b.Property<bool>("RapoarteSaptamanale")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Tema")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("UltimaActualizare")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserProfiles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -274,6 +353,17 @@ namespace MentalHealthTracker.Migrations
                 });
 
             modelBuilder.Entity("MentalHealthTracker.Models.MoodEntry", b =>
+                {
+                    b.HasOne("MentalHealthTracker.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MentalHealthTracker.Models.UserProfile", b =>
                 {
                     b.HasOne("MentalHealthTracker.Models.ApplicationUser", "User")
                         .WithMany()

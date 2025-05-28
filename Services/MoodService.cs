@@ -16,48 +16,6 @@ namespace MentalHealthTracker.Services
         {
             _context = context;
 
-            // Adăugăm date de test doar dacă nu există înregistrări
-            if (!_context.MoodEntries.Any())
-            {
-                SeedTestData();
-            }
-        }
-
-        private void SeedTestData()
-        {
-            var entries = new List<MoodEntry>
-            {
-                new MoodEntry
-                {
-                    Date = DateTime.Today.AddDays(-1),
-                    MoodLevel = 7,
-                    Description = "Am avut o zi productivă la muncă.",
-                    Activities = "Sport, Citit",
-                    Triggers = "Niciun factor declanșator",
-                    SleepHours = 7
-                },
-                new MoodEntry
-                {
-                    Date = DateTime.Today.AddDays(-2),
-                    MoodLevel = 5,
-                    Description = "O zi normală, fără evenimente deosebite.",
-                    Activities = "Plimbare",
-                    Triggers = "Stres la muncă",
-                    SleepHours = 6
-                },
-                new MoodEntry
-                {
-                    Date = DateTime.Today.AddDays(-3),
-                    MoodLevel = 3,
-                    Description = "Am avut o zi dificilă.",
-                    Activities = "Nimic special",
-                    Triggers = "Conflict cu un coleg",
-                    SleepHours = 5
-                }
-            };
-
-            _context.MoodEntries.AddRange(entries);
-            _context.SaveChanges();
         }
 
         public async Task<List<MoodEntry>> GetMoodEntriesAsync(string? userId = null)

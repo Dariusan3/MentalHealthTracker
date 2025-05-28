@@ -1,0 +1,75 @@
+@page "/aichat"
+@using MentalHealthTracker.Services
+@using MudBlazor
+@inject AIChatService AIChatService
+@inject ChatHistoryService ChatHistoryService
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Chat AI</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+    <MudText Typo="Typo.h4" Align="Align.Center" GutterBottom="true">Chat cu AI (local)</MudText>
+    <MudPaper Elevation="2" Class="pa-4 mb-4" Style="min-height: 400px;">
+        <div style="overflow-y:auto; max-height:300px;">
+            @foreach (var msg in Messages)
+            {
+                <MudText Typo="Typo.body1" Color="@(msg.role=="user" ? Color.Primary : Color.Secondary)"><b>@(msg.role=="user" ? "Tu:" : "AI:")</b> @msg.content</MudText>
+            }
+        </div>
+        <MudDivider Class="my-2" />
+        <MudTextField @bind-Value="UserInput" Placeholder="Scrie un mesaj..." FullWidth="true" OnKeyDown="OnKeyDown" Disabled="@IsStreaming" />
+        <MudButton OnClick="SendMessage" Disabled="@DisabledButton" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2">Trimite</MudButton>
+        <MudText>@Response</MudText>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private List<(string role, string content)> Messages = new();
+    private string UserInput = string.Empty;
+    private bool IsStreaming = false;
+    private string CurrentStreaming = string.Empty;
+    private string Response = string.Empty;
+
+    private bool DisabledButton => IsStreaming || string.IsNullOrWhiteSpace(UserInput);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var history = await ChatHistoryService.GetHistoryAsync();
+        foreach (var msg in history)
+        {
+            Messages.Add((msg.Role, msg.Content));
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(UserInput)) return;
+
+        // Salvează mesajul userului
+        await ChatHistoryService.AddMessageAsync("user", UserInput);
+
+        Messages.Add(("user", UserInput));
+        var localInput = UserInput;
+        UserInput = string.Empty;
+        IsStreaming = true;
+        CurrentStreaming = string.Empty;
+
+        // Obține răspunsul AI
+        Response = await AIChatService.GetChatResponseOllamaAsync(localInput);
+
+        // Salvează răspunsul AI
+        await ChatHistoryService.AddMessageAsync("assistant", Response);
+
+        Messages.Add(("assistant", Response));
+        IsStreaming = false;
+        StateHasChanged();
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !IsStreaming)
+        {
+            await SendMessage();
+        }
+    }
+}

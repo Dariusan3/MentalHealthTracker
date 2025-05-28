@@ -1,9 +1,14 @@
-﻿@page "/"
+﻿@page "/home"
 @using MudBlazor
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using MentalHealthTracker.Models
+@using System.Security.Claims
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
 
 <PageTitle>Mental Health Tracker - Acasă</PageTitle>
 
@@ -141,27 +146,49 @@
 </AuthorizeView>
 
 @code {
-    private bool _isFirstRender = true;
+    private ApplicationUser? currentUser;
+    private string? currentUserId;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user?.Identity?.IsAuthenticated == true)
         {
-            _isFirstRender = false;
-            try
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId != null)
             {
-                // Verificăm dacă utilizatorul tocmai s-a autentificat
-                var loginSuccess = await JSRuntime.InvokeAsync<bool>("authHelpers.checkLoginSuccess");
-                if (loginSuccess)
-                {
-                    // Ștergem flag-ul și reîncărcăm pagina pentru a actualiza starea de autentificare
-                    await JSRuntime.InvokeVoidAsync("authHelpers.clearLoginSuccess");
-                    await JSRuntime.InvokeVoidAsync("authHelpers.forceReload");
-                }
+                 // Nu mai verificăm existența utilizatorului în baza de date aici.
+                 // Aceasta se face la nivel global în App.razor.
+                
+                currentUserId = userId;
             }
-            catch (Exception)
+            else
             {
-                // Ignorăm orice eroare care poate apărea în timpul invocării JavaScript
+                // Acest caz ar trebui gestionat deja de App.razor, dar adăugăm un fallback.
+                Console.WriteLine("Index.razor: Utilizator autentificat, dar fără ID claim. Redirecționare la login.");
+                NavigationManager.NavigateTo("/account/login", forceLoad: true);
+            }
+        }
+        else
+        {
+            // Utilizatorul nu este autentificat - redirecționare la login
+            Console.WriteLine("Index.razor: Utilizator neautentificat. Redirecționare la login.");
+            NavigationManager.NavigateTo("/account/login", forceLoad: true);
+        }
+    }
+
+    private async Task LoadUserData()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId != null)
+            {
+                currentUser = await UserManager.FindByIdAsync(userId);
             }
         }
     }
