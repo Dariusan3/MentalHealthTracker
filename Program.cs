@@ -135,6 +135,8 @@ builder.Services.AddScoped<StripeService>();
 // Adăugăm un serviciu de background pentru resetarea zilnică a mesajelor
 builder.Services.AddHostedService<DailyMessageResetService>();
 
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -200,6 +202,7 @@ app.Use(async (context, next) =>
 app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+app.MapHub<NotificationHub>("/notificationhub");
 
 // Inițializare bază de date
 using (var scope = app.Services.CreateScope())
