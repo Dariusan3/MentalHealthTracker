@@ -12,6 +12,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
+@inject ThemeService ThemeService
 @attribute [Authorize]
 
 <PageTitle>Mental Health Tracker - Profil</PageTitle>
@@ -69,7 +70,7 @@
                         <MudSwitch @bind-Value="@userProfile.NotificariZilnice" Color="Color.Primary" Label="Primește notificări zilnice" Class="mt-3" />
                         <MudSwitch @bind-Value="@userProfile.RapoarteSaptamanale" Color="Color.Primary" Label="Primește rapoarte săptămânale" Class="mt-3" />
                         <MudTimePicker @bind-Time="@userProfile.OraNotificare" Label="Ora notificării zilnice" Variant="Variant.Outlined" Class="mt-3" />
-                        <MudSelect T="string" @bind-Value="@userProfile.Tema" Label="Tema aplicației" Variant="Variant.Outlined" Class="mt-3">
+                        <MudSelect T="string" Value="@userProfile.Tema" Label="Tema aplicației" Variant="Variant.Outlined" Class="mt-3" ValueChanged="@OnThemeChangedFromProfile">
                             <MudSelectItem Value='@("light")'>Luminoasă</MudSelectItem>
                             <MudSelectItem Value='@("dark")'>Întunecată</MudSelectItem>
                             <MudSelectItem Value='@("auto")'>Automată (bazată pe setările sistemului)</MudSelectItem>
@@ -169,15 +170,24 @@
                     userProfile = await UserProfileService.GetUserProfileAsync(currentUser.Id);
                     if (userProfile == null)
                     {
+                        var nume = (!string.IsNullOrWhiteSpace(currentUser.FirstName) || !string.IsNullOrWhiteSpace(currentUser.LastName))
+                            ? $"{currentUser.FirstName} {currentUser.LastName}".Trim()
+                            : currentUser.Email ?? "";
                         userProfile = new UserProfile 
                         { 
                             UserId = currentUser.Id, 
-                            Nume = currentUser.UserName ?? "", 
+                            Nume = nume,
                             Email = currentUser.Email ?? "",
-                            DataNasterii = null // Inițializează DataNasterii la null pentru un profil nou
+                            DataNasterii = currentUser.DateOfBirth,
                         };
                         await UserProfileService.CreateOrUpdateProfileAsync(userProfile);
                     }
+
+                    // Aplică tema din profil la inițializare
+                    if (userProfile.Tema == "dark")
+                        ThemeService.SetTheme(true);
+                    else if (userProfile.Tema == "light")
+                        ThemeService.SetTheme(false);
                 }
                 else
                 {
@@ -215,17 +225,35 @@
         }
     }
     
+    private async Task OnThemeChangedFromProfile(string value)
+    {
+        if (userProfile != null)
+        {
+            userProfile.Tema = value;
+            // Nu mai aplicăm tema imediat, se va aplica doar după salvarea preferințelor
+        }
+    }
+
     private async Task SalveazaPreferinte()
     {
-         if (userProfile != null)
+        if (userProfile != null)
         {
-            userProfile.UltimaActualizare = DateTime.UtcNow;
-            await UserProfileService.CreateOrUpdateProfileAsync(userProfile);
-            Snackbar.Add("Preferințe salvate cu succes!", Severity.Success);
-        }
-         else
-        {
-            Snackbar.Add("Eroare la salvarea preferințelor.", Severity.Error);
+            try
+            {
+                await UserProfileService.CreateOrUpdateProfileAsync(userProfile);
+                
+                // Aplicăm tema doar după salvarea preferințelor
+                if (userProfile.Tema == "dark")
+                    await ThemeService.SetTheme(true);
+                else if (userProfile.Tema == "light")
+                    await ThemeService.SetTheme(false);
+                
+                Snackbar.Add("Preferințele au fost salvate cu succes!", Severity.Success);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add("Eroare la salvarea preferințelor: " + ex.Message, Severity.Error);
+            }
         }
     }
     

@@ -13,6 +13,8 @@ using Azure.AI.OpenAI;
 using Azure.Identity;
 using Microsoft.SemanticKernel;
 using System.Net.Http.Headers;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -131,11 +133,14 @@ builder.Services.AddSingleton<AIChatService>();
 builder.Services.AddScoped<ChatHistoryService>();
 builder.Services.AddScoped<UserProfileService>();
 builder.Services.AddScoped<StripeService>();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<ThemeService>();
 
 // Adăugăm un serviciu de background pentru resetarea zilnică a mesajelor
 builder.Services.AddHostedService<DailyMessageResetService>();
 
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<IUserIdProvider, NameIdentifierUserIdProvider>();
 
 var app = builder.Build();
 

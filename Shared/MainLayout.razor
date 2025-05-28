@@ -3,9 +3,12 @@
 @using MentalHealthTracker.Shared
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Web
+@using System.Security.Claims
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject ThemeService ThemeService
+@inject UserProfileService UserProfileService
 
 <MudThemeProvider Theme="AppTheme" />
 <MudDialogProvider />
@@ -16,6 +19,7 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h6" Class="ml-3">Mental Health Tracker</MudText>
         <MudSpacer />
+        <MudIconButton Icon="@(ThemeService.IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)" Color="Color.Inherit" OnClick="ToggleTheme" Title="Comută tema" />
         <LoginDisplay />
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
@@ -36,6 +40,29 @@
     private void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    private async Task ToggleTheme()
+    {
+        await ThemeService.ToggleTheme();
+        SetThemeFromService();
+        StateHasChanged();
+
+        // Actualizăm și profilul utilizatorului
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId != null)
+            {
+                var userProfile = await UserProfileService.GetUserProfileAsync(userId);
+                if (userProfile != null)
+                {
+                    userProfile.Tema = ThemeService.IsDarkMode ? "dark" : "light";
+                    await UserProfileService.CreateOrUpdateProfileAsync(userProfile);
+                }
+            }
+        }
     }
 
     private MudTheme AppTheme = new MudTheme()
@@ -59,6 +86,27 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        ThemeService.OnThemeChanged += OnThemeChanged;
+        
+        // Verificăm și aplicăm tema salvată
+        var currentAuthState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (currentAuthState.User.Identity?.IsAuthenticated == true)
+        {
+            var userId = currentAuthState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId != null)
+            {
+                var userProfile = await UserProfileService.GetUserProfileAsync(userId);
+                if (userProfile != null)
+                {
+                    if (userProfile.Tema == "dark")
+                        await ThemeService.SetTheme(true);
+                    else if (userProfile.Tema == "light")
+                        await ThemeService.SetTheme(false);
+                }
+            }
+        }
+        
+        SetThemeFromService();
         
         // Verificăm starea de autentificare
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -107,6 +155,30 @@
             {
                 Console.WriteLine($"Eroare în OnAfterRenderAsync: {ex.Message}");
             }
+        }
+    }
+
+    private void OnThemeChanged()
+    {
+        SetThemeFromService();
+        StateHasChanged();
+    }
+
+    private void SetThemeFromService()
+    {
+        if (ThemeService.IsDarkMode)
+        {
+            AppTheme.Palette = AppTheme.PaletteDark;
+        }
+        else
+        {
+            AppTheme.Palette = new PaletteLight()
+            {
+                Primary = Colors.Blue.Darken1,
+                Secondary = Colors.DeepPurple.Accent2,
+                AppbarBackground = Colors.Blue.Darken3,
+                Background = Colors.Grey.Lighten5,
+            };
         }
     }
 

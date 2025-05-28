@@ -5,6 +5,8 @@ using System.ClientModel;
 using System.Text;
 using System.Net.Http;
 using System.Text.Json;
+using Microsoft.AspNetCore.SignalR;
+using MentalHealthTracker.Services;
 
 public class AIChatService
 {
@@ -21,7 +23,7 @@ public class AIChatService
         _client = new OpenAIClient(credential, options).GetChatClient(_model);
     }
 
-    public async Task<string> GetChatResponseOllamaAsync(string prompt)
+    public async Task<string> GetChatResponseOllamaAsync(string prompt, IServiceProvider serviceProvider = null)
     {
         var client = new HttpClient();
         var context = "Ești un asistent virtual specializat în sănătate mintală. Răspunde empatic, cu sfaturi utile și validează emoțiile utilizatorului. ";
@@ -39,10 +41,24 @@ public class AIChatService
         var result = await response.Content.ReadAsStringAsync();
 
         using var doc = JsonDocument.Parse(result);
+        string aiResponse = result;
         if (doc.RootElement.TryGetProperty("response", out var responseProp))
         {
-            return responseProp.GetString() ?? string.Empty;
+            aiResponse = responseProp.GetString() ?? string.Empty;
         }
-        return result;
+
+        // Trimite notificare SignalR dacă serviceProvider este furnizat
+        if (serviceProvider != null)
+        {
+            var hubContext = serviceProvider.GetService(typeof(IHubContext<NotificationHub>)) as IHubContext<NotificationHub>;
+            var httpContextAccessor = serviceProvider.GetService(typeof(IHttpContextAccessor)) as IHttpContextAccessor;
+            var userId = httpContextAccessor?.HttpContext?.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (hubContext != null && userId != null)
+            {
+                await hubContext.Clients.User(userId).SendAsync("ReceiveNotification", "✅ AI a generat răspunsul pentru jurnalul tău.");
+            }
+        }
+
+        return aiResponse;
     }
 }

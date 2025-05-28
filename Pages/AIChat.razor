@@ -5,6 +5,9 @@
 @inject ChatHistoryService ChatHistoryService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
+@inject NotificationService NotificationService
+@inject ISnackbar Snackbar
+@inject IServiceProvider ServiceProvider
 
 <PageTitle>Chat AI</PageTitle>
 
@@ -55,6 +58,13 @@
         {
             Messages.Add((msg.Role, msg.Content));
         }
+        await NotificationService.StartAsync();
+        NotificationService.OnNotificationReceived += ShowNotification;
+    }
+
+    private void ShowNotification(string message)
+    {
+        Snackbar.Add(message, Severity.Success);
     }
 
     private async Task SendMessage()
@@ -81,7 +91,7 @@
         CurrentStreaming = string.Empty;
 
         // Obține răspunsul AI
-        Response = await AIChatService.GetChatResponseOllamaAsync(localInput);
+        Response = await AIChatService.GetChatResponseOllamaAsync(localInput, ServiceProvider);
 
         // Salvează răspunsul AI
         await ChatHistoryService.AddMessageAsync("assistant", Response);

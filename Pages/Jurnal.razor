@@ -13,18 +13,157 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @attribute [Authorize]
 
+<style>
+    .mud-tabs {
+        background: var(--mud-palette-surface);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .mud-tab {
+        color: var(--mud-palette-text-primary);
+        transition: background-color 0.2s ease;
+        background: var(--mud-palette-surface);
+    }
+
+    .mud-tab:hover {
+        background: var(--mud-palette-background-grey);
+    }
+
+    .mud-tab.mud-selected {
+        background: var(--mud-palette-primary);
+        color: var(--mud-palette-primary-contrast);
+    }
+
+    .mud-tab-panel {
+        background: var(--mud-palette-surface);
+        border-radius: 0 0 8px 8px;
+        padding: 1rem;
+    }
+
+    .mud-card {
+        background: var(--mud-palette-surface);
+        border: 1px solid var(--mud-palette-divider);
+        border-radius: 8px;
+    }
+
+    .mud-card-content {
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-text {
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-text-field {
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-text-field-label {
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-text-field-input {
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-text-field-helper-text {
+        color: var(--mud-palette-text-secondary);
+    }
+
+    .mud-button {
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-button-filled {
+        color: var(--mud-palette-primary-contrast);
+    }
+
+    .mud-expansion-panel {
+        background: var(--mud-palette-surface);
+        border: 1px solid var(--mud-palette-divider);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .mud-expansion-panel-header {
+        background: var(--mud-palette-surface);
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-expansion-panel-content {
+        background: var(--mud-palette-surface);
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-table {
+        background: var(--mud-palette-surface);
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-table-head {
+        background: var(--mud-palette-surface);
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-table-row {
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-table-cell {
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-table-footer {
+        background: var(--mud-palette-surface);
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-table-toolbar {
+        background: var(--mud-palette-surface);
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-chip {
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-pagination {
+        background: var(--mud-palette-surface);
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-pagination-item {
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-pagination-item-selected {
+        background: var(--mud-palette-primary);
+        color: var(--mud-palette-primary-contrast);
+    }
+
+    .mud-dialog {
+        background: var(--mud-palette-surface);
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-dialog-title {
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-dialog-content {
+        color: var(--mud-palette-text-primary);
+    }
+
+    .mud-dialog-actions {
+        background: var(--mud-palette-surface);
+    }
+</style>
+
 <PageTitle>Mental Health Tracker - Jurnal</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
     <MudText Typo="Typo.h3" Class="mb-4">Jurnal de stare de spirit</MudText>
-
-    <MudButton OnClick="TestApiDirectly" Variant="Variant.Outlined" Color="Color.Secondary" Class="mb-4">
-        Testează conexiunea API
-    </MudButton>
-
-    <MudButton OnClick="TestBulkDeleteApi" Variant="Variant.Outlined" Color="Color.Error" Class="mb-4 ml-2">
-        Testează ștergerea în bloc
-    </MudButton>
 
     <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
         <MudTabPanel Text="Adaugă înregistrare">
@@ -87,31 +226,6 @@
             }
             else
             {
-                <div class="d-flex align-center mb-4">
-                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="LoadAllEntries" Class="mr-2">
-                        Afișează toate înregistrările
-                    </MudButton>
-                    
-                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="LoadPagedEntries">
-                        Afișează cu paginare
-                    </MudButton>
-                    
-                    @if (selectedEntries.Count > 0)
-                    {
-                        <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => OnDeleteSelectedButtonClick())" Class="ml-2">
-                            Șterge înregistrările selectate (@selectedEntries.Count)
-                        </MudButton>
-                        
-                        <button type="button" class="mud-button-root mud-button mud-button-filled mud-button-filled-error mud-button-filled-size-medium mud-ripple ml-2" 
-                                @onclick="OnBulkDeleteViaHtmlButton">
-                            Șterge (@selectedEntries.Count) - HTML
-                        </button>
-                    }
-                    
-                    <MudSpacer />
-                    
-                    <MudText>Total înregistrări: @totalItems</MudText>
-                </div>
                 
                 <MudExpansionPanel Text="Filtre avansate" Class="mb-4">
                     <MudGrid>
@@ -301,31 +415,6 @@
     </MudDialog>
 }
 
-@if (showBulkDeleteDialog)
-{
-    <MudDialog Open="showBulkDeleteDialog" Options="dialogOptions">
-        <TitleContent>
-            <MudText Typo="Typo.h6">Confirmare ștergere în bloc</MudText>
-        </TitleContent>
-        <DialogContent>
-            <MudText>Ești sigur că vrei să ștergi @selectedEntries.Count înregistrări selectate?</MudText>
-            <MudText Typo="Typo.caption" Color="Color.Warning" Class="mt-2">
-                Această operație nu poate fi anulată!
-            </MudText>
-        </DialogContent>
-        <DialogActions>
-            <MudButton OnClick="CloseBulkDeleteDialog" Color="Color.Default">Anulează</MudButton>
-            <MudButton OnClick="@(() => HandleBulkDeleteConfirmation())" Color="Color.Error" Variant="Variant.Filled">
-                Șterge înregistrările
-            </MudButton>
-            <button type="button" class="mud-button-root mud-button mud-button-filled mud-button-filled-error mud-button-filled-size-medium mud-ripple"
-                    @onclick="HandleBulkDeleteConfirmation">
-                Șterge (HTML)
-            </button>
-        </DialogActions>
-    </MudDialog>
-}
-
 @code {
     private List<MoodEntry>? entries;
     private HashSet<MoodEntry> selectedEntries = new HashSet<MoodEntry>();
@@ -354,10 +443,10 @@
     private EditContext? editContext;
 
     // Filtre avansate
-    private DateTime? filterFromDate;
-    private DateTime? filterToDate;
-    private int? filterMinMoodLevel;
-    private int? filterMaxMoodLevel;
+    private DateTime? filterFromDate = null;
+    private DateTime? filterToDate = null;
+    private int? filterMinMoodLevel = null;
+    private int? filterMaxMoodLevel = null;
     private string filterActivities = "";
     private string filterSortBy = "date";
     private string filterSortDirection = "desc";
@@ -390,37 +479,6 @@
 
     private async Task<TableData<MoodEntry>> ServerReload(TableState state)
     {
-        if (showAllEntries)
-        {
-            // Dacă afișăm toate înregistrările, nu facem request la server
-            if (entries == null)
-            {
-                await LoadAllEntries();
-            }
-            
-            // Aplicăm sortarea pe client
-            if (!string.IsNullOrEmpty(state.SortLabel))
-            {
-                switch (state.SortLabel)
-                {
-                    case "date_field":
-                        entries = state.SortDirection == SortDirection.Ascending
-                            ? entries?.OrderBy(e => e.Date).ToList()
-                            : entries?.OrderByDescending(e => e.Date).ToList();
-                        break;
-                        
-                    case "mood_level":
-                        entries = state.SortDirection == SortDirection.Ascending
-                            ? entries?.OrderBy(e => e.MoodLevel).ToList()
-                            : entries?.OrderByDescending(e => e.MoodLevel).ToList();
-                        break;
-                }
-            }
-            
-            return new TableData<MoodEntry>() { TotalItems = entries?.Count ?? 0, Items = entries ?? new List<MoodEntry>() };
-        }
-        
-        // Codul original pentru încărcarea paginată
         isLoading = true;
         
         try
@@ -431,29 +489,10 @@
             
             Console.WriteLine($"ServerReload: Pagina {pageNumber}, Mărime pagină {pageSize}");
             
-            // Verificăm starea de autentificare
-            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-            var isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
-            var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            
-            if (!isAuthenticated || string.IsNullOrEmpty(userId))
-            {
-                Console.WriteLine("ServerReload: Utilizatorul nu este autentificat!");
-                return new TableData<MoodEntry>() { TotalItems = 0, Items = new List<MoodEntry>() };
-            }
-            
-            // Obținem numărul total de înregistrări
-            totalItems = await GetTotalEntriesCount();
-            
             // Construim URL-ul pentru API cu parametri de paginare și filtrare
-            var urlBuilder = new System.Text.StringBuilder($"api/MoodEntries?pageNumber={pageNumber}&pageSize={pageSize}");
+            var urlBuilder = new StringBuilder($"api/MoodEntries?pageNumber={pageNumber}&pageSize={pageSize}");
             
             // Adăugăm parametrii de filtrare dacă sunt setați
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                urlBuilder.Append($"&searchText={Uri.EscapeDataString(searchString)}");
-            }
-            
             if (filterFromDate.HasValue)
             {
                 urlBuilder.Append($"&fromDate={filterFromDate.Value.ToString("yyyy-MM-dd")}");
@@ -464,12 +503,12 @@
                 urlBuilder.Append($"&toDate={filterToDate.Value.ToString("yyyy-MM-dd")}");
             }
             
-            if (filterMinMoodLevel.HasValue)
+            if (filterMinMoodLevel.HasValue && filterMinMoodLevel.Value > 0)
             {
                 urlBuilder.Append($"&minMoodLevel={filterMinMoodLevel.Value}");
             }
             
-            if (filterMaxMoodLevel.HasValue)
+            if (filterMaxMoodLevel.HasValue && filterMaxMoodLevel.Value > 0)
             {
                 urlBuilder.Append($"&maxMoodLevel={filterMaxMoodLevel.Value}");
             }
@@ -480,29 +519,12 @@
             }
             
             // Adăugăm parametrii de sortare
-            if (!string.IsNullOrEmpty(state.SortLabel))
-            {
-                var apiSortBy = state.SortLabel switch
-                {
-                    "date_field" => "date",
-                    "mood_level" => "moodlevel",
-                    _ => state.SortLabel
-                };
-                
-                urlBuilder.Append($"&sortBy={apiSortBy}");
-                
-                var apiSortDirection = state.SortDirection == SortDirection.Ascending ? "asc" : "desc";
-                urlBuilder.Append($"&sortDirection={apiSortDirection}");
-            }
-            else if (!string.IsNullOrEmpty(filterSortBy))
-            {
-                urlBuilder.Append($"&sortBy={filterSortBy}&sortDirection={filterSortDirection}");
-            }
+            urlBuilder.Append($"&sortBy={filterSortBy}&sortDirection={filterSortDirection}");
             
             var url = urlBuilder.ToString();
             Console.WriteLine($"ServerReload: URL API {url}");
             
-            // Obținem înregistrările pentru pagina curentă
+            // Facem request-ul către API
             var response = await Http.GetAsync(url);
             
             if (response.IsSuccessStatusCode)
@@ -513,6 +535,7 @@
                     if (int.TryParse(totalCountValues.FirstOrDefault(), out var totalCount))
                     {
                         totalItems = totalCount;
+                        Console.WriteLine($"ServerReload: Total items: {totalCount}");
                     }
                 }
                 
@@ -521,6 +544,7 @@
                 
                 if (entries != null)
                 {
+                    Console.WriteLine($"ServerReload: S-au încărcat {entries.Count} înregistrări");
                     return new TableData<MoodEntry>() { TotalItems = totalItems, Items = entries };
                 }
             }
@@ -661,43 +685,92 @@
         Console.WriteLine($"OnPageChanged: Navigare la pagina {page}");
         currentPage = page;
         
-        // Actualizăm datele pentru pagina selectată
-        var state = new TableState 
-        { 
-            Page = page - 1, 
-            PageSize = pageSize,
-        };
-        
-        // Dacă avem sortare activă, o păstrăm
-        if (!string.IsNullOrEmpty(filterSortBy))
-        {
-            if (filterSortBy == "date")
-            {
-                state.SortLabel = "date_field";
-            }
-            else if (filterSortBy == "moodlevel")
-            {
-                state.SortLabel = "mood_level";
-            }
-            
-            state.SortDirection = filterSortDirection == "asc" 
-                ? SortDirection.Ascending 
-                : SortDirection.Descending;
-        }
-        
-        isLoading = true;
-        await InvokeAsync(StateHasChanged); // Forțăm actualizarea UI pentru a arăta loading
-        
         try
         {
-            var tableData = await ServerReload(state);
-            entries = tableData.Items.ToList();
-            totalItems = tableData.TotalItems;
+            isLoading = true;
+            await InvokeAsync(StateHasChanged);
+            
+            // Actualizăm datele pentru pagina selectată
+            var state = new TableState 
+            { 
+                Page = page - 1, // Ajustăm indexul paginii pentru server (0-based)
+                PageSize = pageSize,
+                SortLabel = filterSortBy == "date" ? "date_field" : 
+                           filterSortBy == "moodlevel" ? "mood_level" : "",
+                SortDirection = filterSortDirection == "asc" ? 
+                              SortDirection.Ascending : 
+                              SortDirection.Descending
+            };
+            
+            // Construim URL-ul pentru API cu parametri de paginare și filtrare
+            var urlBuilder = new StringBuilder($"api/MoodEntries?pageNumber={page}&pageSize={pageSize}");
+            
+            // Adăugăm parametrii de filtrare dacă sunt setați
+            if (filterFromDate.HasValue)
+            {
+                urlBuilder.Append($"&fromDate={filterFromDate.Value.ToString("yyyy-MM-dd")}");
+            }
+            
+            if (filterToDate.HasValue)
+            {
+                urlBuilder.Append($"&toDate={filterToDate.Value.ToString("yyyy-MM-dd")}");
+            }
+            
+            if (filterMinMoodLevel.HasValue && filterMinMoodLevel.Value > 0)
+            {
+                urlBuilder.Append($"&minMoodLevel={filterMinMoodLevel.Value}");
+            }
+            
+            if (filterMaxMoodLevel.HasValue && filterMaxMoodLevel.Value > 0)
+            {
+                urlBuilder.Append($"&maxMoodLevel={filterMaxMoodLevel.Value}");
+            }
+            
+            if (!string.IsNullOrEmpty(filterActivities))
+            {
+                urlBuilder.Append($"&activities={Uri.EscapeDataString(filterActivities)}");
+            }
+            
+            // Adăugăm parametrii de sortare
+            urlBuilder.Append($"&sortBy={filterSortBy}&sortDirection={filterSortDirection}");
+            
+            var url = urlBuilder.ToString();
+            Console.WriteLine($"OnPageChanged: URL API {url}");
+            
+            // Facem request-ul către API
+            var response = await Http.GetAsync(url);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                // Citim header-ele de paginare
+                if (response.Headers.TryGetValues("X-Total-Count", out var totalCountValues))
+                {
+                    if (int.TryParse(totalCountValues.FirstOrDefault(), out var totalCount))
+                    {
+                        totalItems = totalCount;
+                        Console.WriteLine($"OnPageChanged: Total items: {totalCount}");
+                    }
+                }
+                
+                // Deserializăm rezultatele
+                entries = await response.Content.ReadFromJsonAsync<List<MoodEntry>>();
+                
+                if (entries != null)
+                {
+                    Console.WriteLine($"OnPageChanged: S-au încărcat {entries.Count} înregistrări pentru pagina {page}");
+                }
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"OnPageChanged: Eroare HTTP {response.StatusCode}, Detalii: {error}");
+                await JSRuntime.InvokeVoidAsync("alert", $"Eroare la încărcarea paginii: {error}");
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"OnPageChanged: Eroare: {ex.Message}");
-            await JSRuntime.InvokeVoidAsync("console.error", $"Eroare la schimbarea paginii: {ex.Message}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Eroare la schimbarea paginii: {ex.Message}");
         }
         finally
         {
@@ -711,26 +784,118 @@
         try
         {
             isLoading = true;
+            await InvokeAsync(StateHasChanged);
             
-            // Utilizăm ServerReload pentru a încărca datele
-            var tableData = await ServerReload(new TableState 
-            { 
-                Page = currentPage - 1, 
-                PageSize = pageSize
-            });
+            // Construim URL-ul pentru API cu parametrii de filtrare
+            var urlBuilder = new StringBuilder("api/MoodEntries?");
+            var parameters = new List<string>();
+
+            // Adăugăm parametrii de filtrare dacă sunt setați
+            if (filterFromDate.HasValue)
+            {
+                parameters.Add($"fromDate={filterFromDate.Value:yyyy-MM-dd}");
+            }
+
+            if (filterToDate.HasValue)
+            {
+                parameters.Add($"toDate={filterToDate.Value:yyyy-MM-dd}");
+            }
+
+            if (filterMinMoodLevel.HasValue)
+            {
+                parameters.Add($"minMoodLevel={filterMinMoodLevel.Value}");
+            }
+
+            if (filterMaxMoodLevel.HasValue)
+            {
+                parameters.Add($"maxMoodLevel={filterMaxMoodLevel.Value}");
+            }
+
+            if (!string.IsNullOrEmpty(filterActivities))
+            {
+                parameters.Add($"activities={Uri.EscapeDataString(filterActivities)}");
+            }
+
+            // Adăugăm parametrii de sortare
+            var sortBy = filterSortBy switch
+            {
+                "date" => "date",
+                "moodlevel" => "moodLevel",
+                "sleephours" => "sleepHours",
+                _ => "date"
+            };
             
-            entries = tableData.Items.ToList();
-            totalItems = tableData.TotalItems;
+            parameters.Add($"sortBy={sortBy}");
+            parameters.Add($"sortDirection={filterSortDirection}");
+
+            // Construim URL-ul final
+            var url = urlBuilder + string.Join("&", parameters);
+            Console.WriteLine($"LoadEntries: URL API {url}");
+
+            // Facem request-ul către API
+            var response = await Http.GetAsync(url);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                // Citim header-ele de paginare
+                if (response.Headers.TryGetValues("X-Total-Count", out var totalCountValues))
+                {
+                    if (int.TryParse(totalCountValues.FirstOrDefault(), out var totalCount))
+                    {
+                        totalItems = totalCount;
+                    }
+                }
+
+                // Deserializăm rezultatele
+                entries = await response.Content.ReadFromJsonAsync<List<MoodEntry>>();
+                
+                if (entries != null)
+                {
+                    // Aplicăm sortarea local
+                    entries = ApplyLocalSorting(entries);
+                    Console.WriteLine($"LoadEntries: S-au încărcat {entries.Count} înregistrări");
+                }
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"LoadEntries: Eroare HTTP {response.StatusCode}, Detalii: {error}");
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Jurnal.razor - LoadEntries: Eroare generală: {ex.Message}");
-            await JSRuntime.InvokeVoidAsync("alert", $"Eroare la încărcarea înregistrărilor: {ex.Message}");
+            Console.WriteLine($"LoadEntries: Excepție {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
         }
         finally
         {
             isLoading = false;
+            await InvokeAsync(StateHasChanged);
         }
+    }
+    
+    private List<MoodEntry> ApplyLocalSorting(List<MoodEntry> entries)
+    {
+        if (entries == null) return new List<MoodEntry>();
+
+        var sortedEntries = filterSortBy switch
+        {
+            "date" => filterSortDirection == "asc" 
+                ? entries.OrderBy(e => e.Date).ToList()
+                : entries.OrderByDescending(e => e.Date).ToList(),
+                
+            "moodlevel" => filterSortDirection == "asc"
+                ? entries.OrderBy(e => e.MoodLevel).ToList()
+                : entries.OrderByDescending(e => e.MoodLevel).ToList(),
+                
+            "sleephours" => filterSortDirection == "asc"
+                ? entries.OrderBy(e => e.SleepHours).ToList()
+                : entries.OrderByDescending(e => e.SleepHours).ToList(),
+                
+            _ => entries
+        };
+
+        return sortedEntries;
     }
     
     private async Task HandleValidSubmit()
@@ -979,149 +1144,32 @@
         {
             if (editingEntry == null) return;
             
-            Console.WriteLine($"HandleEditSubmit: Trimit cerere de actualizare pentru înregistrarea cu ID {editingEntry.Id}");
-            
-            // Obținem ID-ul utilizatorului curent
-            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-            var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            
-            if (string.IsNullOrEmpty(userId))
-            {
-                await JSRuntime.InvokeVoidAsync("alert", "Nu sunteți autentificat. Vă rugăm să vă autentificați pentru a edita înregistrări.");
-                return;
-            }
-            
             // Actualizăm data din string
             if (DateTime.TryParse(editingEntryDateString, out DateTime parsedDate))
             {
                 editingEntry.Date = parsedDate;
-                Console.WriteLine($"Data actualizată: {editingEntry.Date}");
-            }
-            else
-            {
-                Console.WriteLine($"Eroare la parsarea datei: {editingEntryDateString}");
-                await JSRuntime.InvokeVoidAsync("alert", $"Formatul datei este invalid: {editingEntryDateString}");
-                return;
             }
             
-            // Ne asigurăm că UserId-ul este setat corect
-            editingEntry.UserId = userId;
-            Console.WriteLine($"UserId setat: {editingEntry.UserId}");
-            
-            // Afișăm informații despre înregistrarea ce va fi actualizată
-            Console.WriteLine($"Trimit actualizare: ID={editingEntry.Id}, Date={editingEntry.Date}, MoodLevel={editingEntry.MoodLevel}");
-            
-            // Folosim un request cu headere pentru a trata cazurile speciale
-            var requestUri = $"api/MoodEntries/{editingEntry.Id}";
-            
-            // Serializăm manual obiectul
-            var jsonContent = System.Text.Json.JsonSerializer.Serialize(editingEntry);
-            var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
-            
-            // Creăm request-ul
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Put,
-                RequestUri = new Uri(requestUri, UriKind.Relative),
-                Content = content
-            };
-            
-            // Adăugăm headere pentru test
-            request.Headers.Add("X-Test-Mode", "true");
-            request.Headers.Add("X-Requested-With", "XMLHttpRequest");
-            
-            Console.WriteLine("Trimit cererea de actualizare...");
-            var response = await Http.SendAsync(request);
-            
-            Console.WriteLine($"Răspuns: Status={response.StatusCode}");
-            var responseContent = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Răspuns conținut: {responseContent}");
+            var response = await Http.PutAsJsonAsync($"api/MoodEntries/{editingEntry.Id}", editingEntry);
             
             if (response.IsSuccessStatusCode)
             {
                 showEditDialog = false;
                 await JSRuntime.InvokeVoidAsync("alert", "Înregistrare actualizată cu succes!");
                 await LoadEntries();
-                
-                // Forțăm reîncărcarea paginii pentru a vedea modificările imediat
-                await JSRuntime.InvokeVoidAsync("location.reload");
             }
             else
             {
-                var error = responseContent;
-                Console.WriteLine($"Eroare la actualizare: {error}");
-                
-                if (responseContent.Contains("nu aparține", StringComparison.OrdinalIgnoreCase) || 
-                    response.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
-                    response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                {
-                    Console.WriteLine("Eroare de autorizare sau proprietate, încercăm cu JavaScript");
-                    await TryEditWithJavaScript(editingEntry);
-                }
-                else
-                {
-                    await JSRuntime.InvokeVoidAsync("alert", $"Eroare la actualizare: {error} (Status: {response.StatusCode})");
-                }
+                var error = await response.Content.ReadAsStringAsync();
+                await JSRuntime.InvokeVoidAsync("alert", $"Eroare la actualizare: {error}");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Excepție în HandleEditSubmit: {ex.Message}");
-            Console.WriteLine($"StackTrace: {ex.StackTrace}");
             await JSRuntime.InvokeVoidAsync("alert", $"Eroare: {ex.Message}");
-            
-            // Încercăm o abordare directă cu JavaScript
-            if (editingEntry != null)
-            {
-                await TryEditWithJavaScript(editingEntry);
-            }
         }
     }
-    
-    private async Task TryEditWithJavaScript(MoodEntry entry)
-    {
-        Console.WriteLine($"TryEditWithJavaScript: Încercăm editarea cu JavaScript pentru ID {entry.Id}");
-        
-        // Serializăm obiectul pentru JavaScript
-        var entryJson = System.Text.Json.JsonSerializer.Serialize(entry);
-        
-        await JSRuntime.InvokeVoidAsync("eval", @"
-            (async () => {
-                try {
-                    console.log('Încercăm editarea JavaScript pentru ID " + entry.Id + @"');
-                    
-                    const entryData = " + entryJson + @";
-                    console.log('Date pentru editare:', entryData);
-                    
-                    const response = await fetch('api/MoodEntries/" + entry.Id + @"', {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'X-Test-Mode': 'true',
-                            'X-Force-Edit': 'true'
-                        },
-                        body: JSON.stringify(entryData)
-                    });
-                    
-                    console.log('JavaScript fetch status:', response.status);
-                    const text = await response.text();
-                    console.log('JavaScript fetch response:', text);
-                    
-                    if (response.ok) {
-                        alert('Editare reușită prin JavaScript!');
-                        window.location.reload();
-                    } else {
-                        alert('Eroare la editare prin JavaScript: ' + response.status + ' ' + text);
-                    }
-                } catch (error) {
-                    console.error('Eroare fetch:', error);
-                    alert('Eroare JavaScript: ' + error.message);
-                }
-            })();
-        ");
-    }
-    
+
     private void CloseEditDialog()
     {
         Console.WriteLine("CloseEditDialog: Închidere dialog editare");
@@ -1567,54 +1615,7 @@
             }
         }
     }
-    
-    private async Task TestApiDirectly()
-    {
-        try
-        {
-            // Testăm un endpoint simplu
-            var apiUrl = $"{NavigationManager.BaseUri}api/MoodEntries/test";
-            Console.WriteLine($"Testare endpoint: {apiUrl}");
-            
-            var message = await JSRuntime.InvokeAsync<string>("fetch", apiUrl)
-                .AsTask()
-                .ContinueWith(async task => {
-                    try {
-                        var response = await task;
-                        var text = await JSRuntime.InvokeAsync<string>("eval", $"response.text()");
-                        return text;
-                    }
-                    catch {
-                        return "Eroare la procesarea răspunsului";
-                    }
-                });
-                
-            await JSRuntime.InvokeVoidAsync("alert", $"Test API: {message}");
-            
-            // Încercăm direct cu Fetch API
-            await JSRuntime.InvokeVoidAsync("eval", @"
-                (async () => {
-                    try {
-                        const response = await fetch('" + apiUrl + @"');
-                        const text = await response.text();
-                        console.log('Răspuns direct fetch:', text);
-                        alert('Răspuns direct fetch: ' + text);
-                    } catch (error) {
-                        console.error('Eroare fetch direct:', error);
-                        alert('Eroare fetch direct: ' + error.message);
-                    }
-                })();
-            ");
-            
-            // Încearcă să creeze o înregistrare test
-            await CreateTestEntry();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Eroare la testarea API: {ex.Message}");
-            await JSRuntime.InvokeVoidAsync("alert", $"Eroare la testarea API: {ex.Message}");
-        }
-    }
+
     
     private async Task CreateTestEntry()
     {
@@ -1889,67 +1890,136 @@
     {
         Console.WriteLine("ApplyFilters: Se aplică filtrele");
         
-        // Resetăm pagina la 1 când se aplică filtrele
-        currentPage = 1;
-        
-        // Reîncărcăm datele cu filtrele aplicate
-        var state = new TableState 
-        { 
-            Page = 0, 
-            PageSize = pageSize
-        };
-        
-        // Adăugăm informații de sortare
-        if (!string.IsNullOrEmpty(filterSortBy))
-        {
-            if (filterSortBy == "date")
-            {
-                state.SortLabel = "date_field";
-            }
-            else if (filterSortBy == "moodlevel")
-            {
-                state.SortLabel = "mood_level";
-            }
-            
-            state.SortDirection = filterSortDirection == "asc" 
-                ? SortDirection.Ascending 
-                : SortDirection.Descending;
-        }
-        
-        isLoading = true;
-        await InvokeAsync(StateHasChanged); // Forțăm actualizarea UI pentru a arăta loading
-        
         try
         {
-            var tableData = await ServerReload(state);
-            entries = tableData.Items.ToList();
-            totalItems = tableData.TotalItems;
+            isLoading = true;
+            await InvokeAsync(StateHasChanged);
+
+            // Construim URL-ul pentru API cu parametrii de filtrare
+            var urlBuilder = new StringBuilder("api/MoodEntries?");
+            var parameters = new List<string>();
+
+            // Adăugăm parametrii de filtrare dacă sunt setați
+            if (filterFromDate.HasValue)
+            {
+                var fromDateStr = filterFromDate.Value.ToString("yyyy-MM-dd");
+                parameters.Add($"fromDate={fromDateStr}");
+                Console.WriteLine($"Filtru dată de la: {fromDateStr}");
+            }
+
+            if (filterToDate.HasValue)
+            {
+                var toDateStr = filterToDate.Value.ToString("yyyy-MM-dd");
+                parameters.Add($"toDate={toDateStr}");
+                Console.WriteLine($"Filtru dată până la: {toDateStr}");
+            }
+
+            if (filterMinMoodLevel.HasValue && filterMinMoodLevel.Value > 0)
+            {
+                parameters.Add($"minMoodLevel={filterMinMoodLevel.Value}");
+                Console.WriteLine($"Filtru nivel minim: {filterMinMoodLevel.Value}");
+            }
+
+            if (filterMaxMoodLevel.HasValue && filterMaxMoodLevel.Value > 0)
+            {
+                parameters.Add($"maxMoodLevel={filterMaxMoodLevel.Value}");
+                Console.WriteLine($"Filtru nivel maxim: {filterMaxMoodLevel.Value}");
+            }
+
+            if (!string.IsNullOrEmpty(filterActivities))
+            {
+                parameters.Add($"activities={Uri.EscapeDataString(filterActivities)}");
+                Console.WriteLine($"Filtru activități: {filterActivities}");
+            }
+
+            // Adăugăm parametrii de sortare
+            parameters.Add($"sortBy={filterSortBy}");
+            parameters.Add($"sortDirection={filterSortDirection}");
+            Console.WriteLine($"Sortare după: {filterSortBy}, direcție: {filterSortDirection}");
+
+            // Construim URL-ul final
+            var url = urlBuilder + string.Join("&", parameters);
+            Console.WriteLine($"URL API cu filtre: {url}");
+
+            // Facem request-ul către API
+            var response = await Http.GetAsync(url);
+            Console.WriteLine($"Răspuns API status: {response.StatusCode}");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                // Citim header-ele de paginare
+                if (response.Headers.TryGetValues("X-Total-Count", out var totalCountValues))
+                {
+                    if (int.TryParse(totalCountValues.FirstOrDefault(), out var totalCount))
+                    {
+                        totalItems = totalCount;
+                        Console.WriteLine($"Număr total de înregistrări: {totalCount}");
+                    }
+                }
+
+                // Deserializăm rezultatele
+                var content = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Conținut răspuns: {content}");
+                
+                entries = await response.Content.ReadFromJsonAsync<List<MoodEntry>>();
+                
+                if (entries != null)
+                {
+                    // Resetăm pagina la 1 când se aplică filtrele
+                    currentPage = 1;
+                    
+                    // Aplicăm sortarea local dacă este necesar
+                    entries = ApplyLocalSorting(entries);
+                    
+                    // Afișăm un mesaj de succes
+                    await JSRuntime.InvokeVoidAsync("console.log", $"Filtre aplicate cu succes. {entries.Count} înregistrări găsite.");
+                    
+                    // Forțăm reîncărcarea UI-ului
+                    await InvokeAsync(StateHasChanged);
+                    
+                    // Reîncărcăm datele pentru tabel
+                    var tableState = new TableState 
+                    { 
+                        Page = 0, 
+                        PageSize = pageSize,
+                        SortLabel = filterSortBy == "date" ? "date_field" : 
+                                  filterSortBy == "moodlevel" ? "mood_level" : "",
+                        SortDirection = filterSortDirection == "asc" ? 
+                                      SortDirection.Ascending : 
+                                      SortDirection.Descending
+                    };
+                    
+                    // Forțăm reîncărcarea completă a datelor
+                    showAllEntries = false;
+                    await LoadPagedEntries();
+                    
+                    // Forțăm din nou reîncărcarea UI-ului
+                    await InvokeAsync(StateHasChanged);
+                }
+                else
+                {
+                    Console.WriteLine("Nu s-au putut deserializa înregistrările");
+                    await JSRuntime.InvokeVoidAsync("alert", "Nu s-au putut încărca înregistrările. Vă rugăm să încercați din nou.");
+                }
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Eroare la aplicarea filtrelor: {error}");
+                await JSRuntime.InvokeVoidAsync("alert", $"Eroare la aplicarea filtrelor: {error}");
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ApplyFilters: Eroare: {ex.Message}");
+            Console.WriteLine($"Excepție la aplicarea filtrelor: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Eroare: {ex.Message}");
         }
         finally
         {
             isLoading = false;
             await InvokeAsync(StateHasChanged);
         }
-    }
-    
-    private async Task ResetFilters()
-    {
-        // Resetăm toate filtrele
-        filterFromDate = null;
-        filterToDate = null;
-        filterMinMoodLevel = null;
-        filterMaxMoodLevel = null;
-        filterActivities = "";
-        filterSortBy = "date";
-        filterSortDirection = "desc";
-        searchString = "";
-        
-        // Reîncărcăm datele fără filtre
-        await ServerReload(new TableState { Page = 0, PageSize = pageSize });
     }
 
     private void ShowBulkDeleteDialog()
@@ -1960,6 +2030,40 @@
         {
             showBulkDeleteDialog = true;
             StateHasChanged(); // Forțăm actualizarea UI
+        }
+    }
+    
+    private async Task ResetFilters()
+    {
+        try
+        {
+            Console.WriteLine("ResetFilters: Se resetează filtrele");
+            
+            // Resetăm toate filtrele
+            filterFromDate = null;
+            filterToDate = null;
+            filterMinMoodLevel = null;
+            filterMaxMoodLevel = null;
+            filterActivities = "";
+            filterSortBy = "date";
+            filterSortDirection = "desc";
+            searchString = "";
+            currentPage = 1;
+
+            // Reîncărcăm datele fără filtre
+            await LoadEntries();
+            
+            // Afișăm un mesaj de succes
+            await JSRuntime.InvokeVoidAsync("console.log", "Filtre resetate cu succes.");
+            
+            // Forțăm reîncărcarea UI-ului
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Excepție la resetarea filtrelor: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            await JSRuntime.InvokeVoidAsync("alert", $"Eroare la resetarea filtrelor: {ex.Message}");
         }
     }
     
@@ -2178,129 +2282,6 @@
         // Deschidem dialogul
         showBulkDeleteDialog = true;
         StateHasChanged();
-    }
-
-    private async Task TestBulkDeleteApi()
-    {
-        Console.WriteLine("TestBulkDeleteApi: Începere test ștergere în bloc");
-        await JSRuntime.InvokeVoidAsync("console.log", "Test ștergere în bloc");
-        
-        try
-        {
-            // Verificăm dacă avem înregistrări pentru a testa ștergerea
-            if (entries == null || entries.Count == 0)
-            {
-                // Încărcăm toate înregistrările dacă nu sunt încărcate
-                await LoadAllEntries();
-                
-                if (entries == null || entries.Count == 0)
-                {
-                    await JSRuntime.InvokeVoidAsync("alert", "Nu există înregistrări pentru test");
-                    return;
-                }
-            }
-            
-            // Verificăm dacă avem înregistrări selectate
-            if (selectedEntries.Count == 0)
-            {
-                // Dacă nu avem înregistrări selectate, selectăm automat primele 2 pentru test
-                selectedEntries = new HashSet<MoodEntry>(entries.Take(Math.Min(2, entries.Count)));
-                await JSRuntime.InvokeVoidAsync("alert", $"Am selectat automat {selectedEntries.Count} înregistrări pentru test");
-            }
-            
-            // Listăm ID-urile selectate
-            var idsToDelete = selectedEntries.Select(e => e.Id).ToList();
-            Console.WriteLine($"ID-uri pentru test: {string.Join(", ", idsToDelete)}");
-            
-            // Verificăm informații despre înregistrările selectate
-            foreach (var entry in selectedEntries)
-            {
-                Console.WriteLine($"Înregistrare selectată: ID={entry.Id}, Data={entry.Date}, UserId={entry.UserId}");
-            }
-            
-            // Verificăm starea de autentificare
-            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-            var isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
-            var userName = authState.User.Identity?.Name ?? "necunoscut";
-            var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "necunoscut";
-            
-            Console.WriteLine($"Informații autentificare: Autentificat={isAuthenticated}, User={userName}, ID={userId}");
-            
-            // Creăm request-ul direct
-            var jsonContent = JsonSerializer.Serialize(idsToDelete);
-            Console.WriteLine($"JSON pentru test: {jsonContent}");
-            
-            // Adăugăm toate headerele necesare
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Delete,
-                RequestUri = new Uri($"{NavigationManager.BaseUri}api/MoodEntries/bulk"),
-                Content = new StringContent(jsonContent, Encoding.UTF8, "application/json")
-            };
-            
-            // Copiem headerele importante din clientul original pentru autentificare
-            if (Http.DefaultRequestHeaders.Contains("Authorization"))
-            {
-                var authHeader = Http.DefaultRequestHeaders.GetValues("Authorization").FirstOrDefault();
-                if (!string.IsNullOrEmpty(authHeader))
-                {
-                    request.Headers.Add("Authorization", authHeader);
-                    Console.WriteLine($"S-a adăugat header de autorizare: {authHeader}");
-                }
-            }
-            
-            // Adăugăm header pentru CSRF (dacă există)
-            var antiforgeryHeader = Http.DefaultRequestHeaders
-                .Where(h => h.Key.Contains("XSRF") || h.Key.Contains("RequestVerification"))
-                .FirstOrDefault();
-                
-            if (!string.IsNullOrEmpty(antiforgeryHeader.Key))
-            {
-                request.Headers.Add(antiforgeryHeader.Key, antiforgeryHeader.Value.FirstOrDefault());
-                Console.WriteLine($"S-a adăugat header anti-CSRF: {antiforgeryHeader.Key}");
-            }
-            
-            // Adăugăm un header pentru XHR (multe servere tratează cererile XHR diferit)
-            request.Headers.Add("X-Requested-With", "XMLHttpRequest");
-            
-            // Afișăm toate headerele pentru diagnosticare
-            Console.WriteLine("Headere pentru cererea HTTP:");
-            foreach (var header in request.Headers)
-            {
-                Console.WriteLine($"  {header.Key}: {string.Join(", ", header.Value)}");
-            }
-            
-            // Afișăm un mesaj de confirmare
-            await JSRuntime.InvokeVoidAsync("alert", $"Se trimite cerere de ștergere pentru {idsToDelete.Count} înregistrări: {string.Join(", ", idsToDelete)}");
-            
-            // Trimitem cererea
-            Console.WriteLine("Trimit cerere de test...");
-            var response = await Http.SendAsync(request);
-            Console.WriteLine($"Răspuns test: Status={response.StatusCode}");
-            
-            // Afișăm headerele răspunsului
-            Console.WriteLine("Headere răspuns:");
-            foreach (var header in response.Headers)
-            {
-                Console.WriteLine($"  {header.Key}: {string.Join(", ", header.Value)}");
-            }
-            
-            // Procesăm răspunsul
-            var resultJson = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Răspuns JSON: {resultJson}");
-            
-            // Afișăm un mesaj cu rezultatul
-            await JSRuntime.InvokeVoidAsync("alert", $"Răspuns: {response.StatusCode}\n\n{resultJson}");
-            
-            // Reîncărcăm datele
-            await LoadEntries();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Eroare la testarea ștergerii în bloc: {ex.Message}");
-            Console.WriteLine($"StackTrace: {ex.StackTrace}");
-            await JSRuntime.InvokeVoidAsync("alert", $"Eroare: {ex.Message}");
-        }
     }
 
     private async Task OpenJsEditDialog(MoodEntry entry)

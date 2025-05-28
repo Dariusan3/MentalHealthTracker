@@ -34,22 +34,6 @@
 </AuthorizeView>
 
 <MudDivider Class="my-2" />
-<MudButton OnClick="CheckAuthenticationState" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">
-    Verifică Autentificarea
-</MudButton>
-<MudButton OnClick="CheckAuthStatusAPI" Variant="Variant.Filled" Color="Color.Tertiary" FullWidth="true" Class="mt-2">
-    Verifică API
-</MudButton>
-<MudButton OnClick="CheckLocalStorage" Variant="Variant.Filled" Color="Color.Info" FullWidth="true" Class="mt-2">
-    Verifică LocalStorage
-</MudButton>
-<MudButton OnClick="ForceReload" Variant="Variant.Filled" Color="Color.Secondary" FullWidth="true" Class="mt-2">
-    Reîncarcă Pagina
-</MudButton>
-<MudButton OnClick="ForceStateRefresh" Variant="Variant.Filled" Color="Color.Warning" FullWidth="true" Class="mt-2">
-    Reîmprospătează Starea
-</MudButton>
-
 @code {
     protected override void OnAfterRender(bool firstRender)
     {
@@ -57,94 +41,6 @@
         {
             // Forțăm reîncărcarea componentei când se schimbă URL-ul
             NavigationManager.LocationChanged += (sender, e) => StateHasChanged();
-        }
-    }
-
-    private async Task CheckAuthenticationState()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
-        var userName = authState.User.Identity?.Name ?? "necunoscut";
-        
-        if (isAuthenticated)
-        {
-            await JSRuntime.InvokeVoidAsync("alert", $"Autentificat ca: {userName}");
-        }
-        else
-        {
-            await JSRuntime.InvokeVoidAsync("alert", "Nu sunteți autentificat");
-        }
-    }
-    
-    private async Task CheckAuthStatusAPI()
-    {
-        try
-        {
-            var response = await Http.GetAsync("api/account/status");
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadFromJsonAsync<AuthStatus>();
-                if (result != null)
-                {
-                    if (result.IsAuthenticated)
-                    {
-                        await JSRuntime.InvokeVoidAsync("alert", $"API: Autentificat ca {result.UserName}");
-                    }
-                    else
-                    {
-                        await JSRuntime.InvokeVoidAsync("alert", "API: Nu sunteți autentificat");
-                    }
-                }
-            }
-            else
-            {
-                await JSRuntime.InvokeVoidAsync("alert", $"Eroare la verificarea API: {response.StatusCode}");
-            }
-        }
-        catch (Exception ex)
-        {
-            await JSRuntime.InvokeVoidAsync("alert", $"Excepție la verificarea API: {ex.Message}");
-        }
-    }
-    
-    private async Task CheckLocalStorage()
-    {
-        try
-        {
-            var localAuthState = await JSRuntime.InvokeAsync<object>("checkLocalAuthState");
-            await JSRuntime.InvokeVoidAsync("alert", $"Verificare LocalStorage: {System.Text.Json.JsonSerializer.Serialize(localAuthState)}");
-        }
-        catch (Exception ex)
-        {
-            await JSRuntime.InvokeVoidAsync("alert", $"Eroare: {ex.Message}");
-        }
-    }
-    
-    private async Task ForceReload()
-    {
-        await JSRuntime.InvokeVoidAsync("location.reload");
-    }
-    
-    private async Task ForceStateRefresh()
-    {
-        try
-        {
-            // Forțăm reîncărcarea stării de autentificare folosind endpoint-ul nou
-            await JSRuntime.InvokeVoidAsync("forceAuthRefresh");
-            
-            // Forțăm revalidarea stării de autentificare
-            if (AuthenticationStateProvider is MentalHealthTracker.Areas.Identity.RevalidatingIdentityAuthenticationStateProvider<MentalHealthTracker.Models.ApplicationUser> revalidatingProvider)
-            {
-                revalidatingProvider.ForceRevalidate();
-                await JSRuntime.InvokeVoidAsync("alert", "Starea de autentificare a fost forțat revalidată");
-            }
-            
-            // Forțăm reîmprospătarea componentei
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            await JSRuntime.InvokeVoidAsync("alert", $"Eroare: {ex.Message}");
         }
     }
     

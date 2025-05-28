@@ -2,51 +2,42 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @using Microsoft.AspNetCore.WebUtilities
+@using MudBlazor
 
 <PageTitle>Plată reușită</PageTitle>
 
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-body text-center">
-                    <div class="mb-4">
-                        <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
-                    </div>
-                    <h2 class="card-title">Plată procesată cu succes!</h2>
-                    <p class="card-text lead">Îți mulțumim pentru abonare la planul Premium!</p>
-                    <p>Acum te poți bucura de conversații nelimitate cu chatbot-ul nostru.</p>
-                    
-                    <hr>
-                    
-                    <button class="btn btn-primary mt-3" @onclick="GoToChat">
-                        Începe să conversezi
-                    </button>
-                    <button class="btn btn-outline-secondary mt-3 ms-2" @onclick="GoToHome">
-                        Înapoi la pagina principală
-                    </button>
-                    
-                    <div class="mt-4">
-                        <small class="text-muted">
-                            Numărul tranzacției: @sessionId
-                        </small>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<MudContainer MaxWidth="MaxWidth.Medium" Class="d-flex justify-center align-center" Style="min-height: 80vh;">
+    <MudCard Elevation="8" Class="p-6 rounded-xl text-center animate__animated animate__fadeInUp" Style="max-width: 500px; width: 100%;">
+        <MudCardContent>
+            <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Color="Color.Warning" Size="Size.Large" Class="mb-2 animate__animated animate__tada" />
+            <MudChip Color="Color.Warning" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Star" Class="mb-3" Style="font-size:1.2rem;">Premium activat!</MudChip>
+            <MudText Typo="Typo.h4" Color="Color.Success" Class="mb-2">Plată procesată cu succes!</MudText>
+            <MudText Typo="Typo.h6" Class="mb-2">Îți mulțumim pentru abonare la planul <b>Premium</b>!</MudText>
+            <MudText Typo="Typo.body1" Class="mb-2">Acum te poți bucura de <b>conversații nelimitate</b> cu chatbot-ul nostru.</MudText>
+            <MudDivider Class="my-3" />
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" OnClick="GoToChat" Class="me-2" StartIcon="@Icons.Material.Filled.Chat">Începe să conversezi</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Large" OnClick="GoToHome" StartIcon="@Icons.Material.Filled.Home">Înapoi la pagina principală</MudButton>
+            <MudText Typo="Typo.caption" Class="mt-4 d-block" Color="Color.Info">
+                <MudIcon Icon="@Icons.Material.Filled.ReceiptLong" Size="Size.Medium" Class="me-1" />Număr tranzacție: <b>@sessionId</b>
+            </MudText>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
+
+<MudSnackbarProvider />
 
 @code {
     private string sessionId = string.Empty;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("session_id", out var sessionIdValue))
         {
             sessionId = sessionIdValue;
         }
+        // Confetti la succes
+        await JSRuntime.InvokeVoidAsync("eval", "if(window.confetti){window.confetti()};");
     }
 
     private void GoToChat()
