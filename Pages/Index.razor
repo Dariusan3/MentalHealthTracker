@@ -150,31 +150,46 @@
 @code {
     private ApplicationUser? currentUser;
     private string? currentUserId;
+    private bool isLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        if (user?.Identity?.IsAuthenticated == true)
+        try
         {
-            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId != null)
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user?.Identity?.IsAuthenticated == true)
             {
-                currentUserId = userId;
+                var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userId != null)
+                {
+                    currentUserId = userId;
+                    await LoadUserData();
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Eroare la inițializare: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
         }
     }
 
     private async Task LoadUserData()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        if (authState.User.Identity?.IsAuthenticated == true)
+        if (currentUserId != null)
         {
-            var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId != null)
+            try
             {
-                currentUser = await UserManager.FindByIdAsync(userId);
+                currentUser = await UserManager.FindByIdAsync(currentUserId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Eroare la încărcarea datelor utilizatorului: {ex.Message}");
             }
         }
     }

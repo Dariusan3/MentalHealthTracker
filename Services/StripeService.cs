@@ -48,7 +48,7 @@ namespace MentalHealthTracker.Services
                         {
                             PriceData = new SessionLineItemPriceDataOptions
                             {
-                                UnitAmount = 999, // 9.99 în moneda specificată (ex: RON, USD, EUR)
+                                UnitAmount = 999,
                                 Currency = "ron",
                                 ProductData = new SessionLineItemPriceDataProductDataOptions
                                 {
@@ -79,9 +79,9 @@ namespace MentalHealthTracker.Services
                 var user = await _userManager.FindByIdAsync(userId);
                 if (user != null)
                 {
-                    // Aici poți stoca ID-ul de sesiune dacă este necesar
-                    // user.StripeSessionId = session.Id;
+                    user.StripeCustomerId = session.CustomerId;
                     await _userManager.UpdateAsync(user);
+                    Console.WriteLine($"Sesiune Stripe creată pentru utilizatorul {user.Email} cu ID: {session.Id}");
                 }
 
                 return session.Url;
@@ -93,19 +93,54 @@ namespace MentalHealthTracker.Services
             }
         }
 
-        public async Task HandleCheckoutSessionCompletedAsync(Event stripeEvent)
+        public async Task<bool> VerifyAndActivateSubscription(string sessionId)
         {
-            var session = stripeEvent.Data.Object as Session;
-            if (session == null) return;
-
-            var userId = session.Metadata["UserId"];
-            var user = await _userManager.FindByIdAsync(userId);
-            
-            if (user != null)
+            try
             {
+                var service = new SessionService();
+                var session = await service.GetAsync(sessionId);
+                
+                if (session == null)
+                {
+                    Console.WriteLine($"Sesiunea {sessionId} nu a fost găsită");
+                    return false;
+                }
+
+                if (session.PaymentStatus != "paid")
+                {
+                    Console.WriteLine($"Sesiunea {sessionId} nu este plătită. Status: {session.PaymentStatus}");
+                    return false;
+                }
+
+                var userId = session.Metadata["UserId"];
+                var user = await _userManager.FindByIdAsync(userId);
+                
+                if (user == null)
+                {
+                    Console.WriteLine($"Utilizatorul cu ID {userId} nu a fost găsit");
+                    return false;
+                }
+
                 user.IsSubscribed = true;
                 user.StripeCustomerId = session.CustomerId;
-                await _userManager.UpdateAsync(user);
+                user.MessagesLeftToday = int.MaxValue;
+
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    Console.WriteLine($"Abonament activat cu succes pentru utilizatorul {user.Email}");
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine($"Eroare la actualizarea utilizatorului: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Eroare la verificarea sesiunii: {ex.Message}");
+                return false;
             }
         }
 

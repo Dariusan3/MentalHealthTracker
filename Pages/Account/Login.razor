@@ -24,6 +24,10 @@
             {
                 <MudAlert Severity="Severity.Error" Class="mb-4" Variant="Variant.Filled">@errorMessage</MudAlert>
             }
+             @if (!string.IsNullOrEmpty(successMessage))
+            {
+                <MudAlert Severity="Severity.Success" Class="mb-4" Variant="Variant.Filled">@successMessage</MudAlert>
+            }
             
             <EditForm Model="@loginRequest" OnValidSubmit="HandleSubmit">
                 <DataAnnotationsValidator />
@@ -84,6 +88,7 @@
     private LoginRequest loginRequest = new LoginRequest();
     private bool isProcessing = false;
     private string? errorMessage;
+    private string? successMessage;
     
     private bool isPasswordVisible = false;
     private InputType passwordInputType => isPasswordVisible ? InputType.Text : InputType.Password;
@@ -133,7 +138,7 @@
                 if (result != null && result.Success)
                 {
                     // Adăugăm un mesaj de diagnosticare
-                    errorMessage = "Autentificare reușită! Redirecționare...";
+                    successMessage = "Autentificare reușită! Redirecționare...";
                     Console.WriteLine($"Autentificare reușită pentru {loginRequest.Email}");
                     Console.WriteLine($"UserId: {result.UserId}, UserName: {result.UserName}");
                     StateHasChanged();
