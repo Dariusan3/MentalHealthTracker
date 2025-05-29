@@ -4,11 +4,13 @@
 @using Microsoft.AspNetCore.Identity
 @using MentalHealthTracker.Models
 @using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
+@attribute [AllowAnonymous]
 
 <PageTitle>Mental Health Tracker - Acasă</PageTitle>
 
@@ -157,26 +159,10 @@
         if (user?.Identity?.IsAuthenticated == true)
         {
             var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
             if (userId != null)
             {
-                 // Nu mai verificăm existența utilizatorului în baza de date aici.
-                 // Aceasta se face la nivel global în App.razor.
-                
                 currentUserId = userId;
             }
-            else
-            {
-                // Acest caz ar trebui gestionat deja de App.razor, dar adăugăm un fallback.
-                Console.WriteLine("Index.razor: Utilizator autentificat, dar fără ID claim. Redirecționare la login.");
-                NavigationManager.NavigateTo("/account/login", forceLoad: true);
-            }
-        }
-        else
-        {
-            // Utilizatorul nu este autentificat - redirecționare la login
-            Console.WriteLine("Index.razor: Utilizator neautentificat. Redirecționare la login.");
-            NavigationManager.NavigateTo("/account/login", forceLoad: true);
         }
     }
 

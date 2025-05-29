@@ -31,6 +31,12 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
+        // Redirecționăm către pagina Home dacă suntem pe ruta principală
+        if (NavigationManager.Uri == NavigationManager.BaseUri)
+        {
+            NavigationManager.NavigateTo("/home");
+        }
+
         // Permite circuitului Blazor să se inițializeze și să randeze componenta inițială
         await Task.Yield();
 
