@@ -13,23 +13,23 @@
             <MudMenuItem>
                 <div class="d-flex flex-column">
                     <MudText Typo="Typo.subtitle1">@context.User.Identity?.Name</MudText>
-                    <MudText Typo="Typo.caption">Utilizator autentificat</MudText>
+                    <MudText Typo="Typo.caption">Authenticated user</MudText>
                 </div>
             </MudMenuItem>
             <MudDivider />
-            <MudMenuItem Href="profil" Icon="@Icons.Material.Filled.Person">Profil</MudMenuItem>
-            <MudMenuItem Href="jurnal" Icon="@Icons.Material.Filled.Book">Jurnal</MudMenuItem>
-            <MudMenuItem Href="statistici" Icon="@Icons.Material.Filled.BarChart">Statistici</MudMenuItem>
-            <MudMenuItem Href="resurse" Icon="@Icons.Material.Filled.LibraryBooks">Resurse</MudMenuItem>
+            <MudMenuItem Href="profil" Icon="@Icons.Material.Filled.Person">Profile</MudMenuItem>
+            <MudMenuItem Href="jurnal" Icon="@Icons.Material.Filled.Book">Journal</MudMenuItem>
+            <MudMenuItem Href="statistici" Icon="@Icons.Material.Filled.BarChart">Statistics</MudMenuItem>
+            <MudMenuItem Href="resurse" Icon="@Icons.Material.Filled.LibraryBooks">Resources</MudMenuItem>
             <MudDivider />
-            <MudMenuItem OnClick="CheckAuthStatus" Icon="@Icons.Material.Filled.Security">Verifică Autentificarea</MudMenuItem>
-            <MudMenuItem OnClick="BeginSignOut" Icon="@Icons.Material.Filled.Logout">Deconectare</MudMenuItem>
+            <MudMenuItem OnClick="CheckAuthStatus" Icon="@Icons.Material.Filled.Security">Check Authentication</MudMenuItem>
+            <MudMenuItem OnClick="BeginSignOut" Icon="@Icons.Material.Filled.Logout">Logout</MudMenuItem>
         </MudMenu>
     </Authorized>
     <NotAuthorized>
         <MudStack Row="true">
-            <MudButton Variant="Variant.Text" Color="Color.Inherit" Href="account/register">Înregistrare</MudButton>
-            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="account/login">Autentificare</MudButton>
+            <MudButton Variant="Variant.Text" Color="Color.Inherit" Href="account/register">Register</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="account/login">Login</MudButton>
         </MudStack>
     </NotAuthorized>
 </AuthorizeView>
@@ -39,40 +39,40 @@
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
-        var userName = authState.User.Identity?.Name ?? "necunoscut";
+        var userName = authState.User.Identity?.Name ?? "unknown";
         
         await JSRuntime.InvokeVoidAsync("alert", isAuthenticated 
-            ? $"Autentificat ca: {userName}" 
-            : "Nu sunteți autentificat");
+            ? $"Authenticated as: {userName}" 
+            : "You are not authenticated");
     }
     
     private async Task BeginSignOut()
     {
         try
         {
-            // Forțăm ștergerea datelor din localStorage și sessionStorage
+            // Forcing data clearance from localStorage and sessionStorage
             await JSRuntime.InvokeVoidAsync("localStorage.clear");
             await JSRuntime.InvokeVoidAsync("sessionStorage.clear");
             
-            // Forțăm ștergerea cookie-urilor prin JavaScript
+            // Forcing cookie clearance via JavaScript
             await JSRuntime.InvokeVoidAsync("eval", @"
                 document.cookie.split(';').forEach(function(c) {
                     document.cookie = c.trim().split('=')[0] + '=;' + 'expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;';
                 });
             ");
             
-            // Afișăm un mesaj de confirmare
-            await JSRuntime.InvokeVoidAsync("alert", "Ați fost deconectat cu succes!");
+            // Showing a confirmation message
+            await JSRuntime.InvokeVoidAsync("alert", "You have been logged out successfully!");
             
-            // Redirecționăm către endpoint-ul de deconectare directă
+            // Redirecting to direct logout endpoint
             NavigationManager.NavigateTo("/api/account/logout-direct", true);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Eroare la deconectare: {ex.Message}");
+            Console.WriteLine($"Error logging out: {ex.Message}");
             
-            // În caz de eroare, redirecționăm oricum către endpoint-ul de deconectare
+            // In case of error, redirecting to logout endpoint anyway
             NavigationManager.NavigateTo("/api/account/logout-direct", true);
         }
     }
-} 
+}

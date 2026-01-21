@@ -161,16 +161,16 @@
     }
 </style>
 
-<PageTitle>Mental Health Tracker - Jurnal</PageTitle>
+<PageTitle>Mental Health Tracker - Journal</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
-    <MudText Typo="Typo.h3" Class="mb-4">Jurnalul meu</MudText>
+    <MudText Typo="Typo.h3" Class="mb-4">My Journal</MudText>
 
     @if (isLoading)
     {
         <div class="d-flex flex-column align-center my-8">
             <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
-            <MudText Class="mt-4">Se încarcă înregistrările...</MudText>
+            <MudText Class="mt-4">Loading entries...</MudText>
         </div>
     }
     else if (!string.IsNullOrEmpty(errorMessage))
@@ -180,7 +180,7 @@
                 @errorMessage
             </MudAlert>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LoadEntries">
-                Reîncearcă
+                Retry
             </MudButton>
         </MudPaper>
     }
@@ -188,12 +188,12 @@
     {
         <MudPaper Class="pa-4" Elevation="3">
             <div class="d-flex justify-space-between align-center mb-4">
-                <MudText Typo="Typo.h5">Adaugă o nouă înregistrare</MudText>
+                <MudText Typo="Typo.h5">Add a new entry</MudText>
                 <MudButton Variant="Variant.Filled" 
                           Color="Color.Primary" 
                           OnClick="@(() => showAddDialog = true)"
                           StartIcon="@Icons.Material.Filled.Add">
-                    Adaugă
+                    Add
                 </MudButton>
             </div>
 
@@ -202,7 +202,7 @@
             @if (entries == null || !entries.Any())
             {
                 <MudAlert Severity="Severity.Info" Variant="Variant.Filled" Class="mb-3">
-                    Nu există înregistrări în jurnal. Adaugă prima ta înregistrare pentru a începe să urmărești starea ta de spirit.
+                    No journal entries yet. Add your first entry to start tracking your mood.
                 </MudAlert>
             }
             else
@@ -223,26 +223,26 @@
                          Breakpoint="Breakpoint.Sm"
                          RowClassFunc="@((entry, index) => GetRowClass(entry))">
                     <ToolBarContent>
-                        <MudText Typo="Typo.h6">Înregistrări</MudText>
+                        <MudText Typo="Typo.h6">Entries</MudText>
                         <MudSpacer />
                         <MudTextField @bind-Value="searchString" 
-                                    Placeholder="Caută..." 
+                                    Placeholder="Search..." 
                                     Adornment="Adornment.Start" 
                                     AdornmentIcon="@Icons.Material.Filled.Search" 
                                     IconSize="Size.Medium" 
                                     Class="mt-0" />
                     </ToolBarContent>
                     <HeaderContent>
-                        <MudTh>Data</MudTh>
-                        <MudTh>Stare de spirit</MudTh>
-                        <MudTh>Activități</MudTh>
-                        <MudTh>Factori declanșatori</MudTh>
-                        <MudTh>Ore de somn</MudTh>
-                        <MudTh>Acțiuni</MudTh>
+                        <MudTh>Date</MudTh>
+                        <MudTh>Mood</MudTh>
+                        <MudTh>Activities</MudTh>
+                        <MudTh>Triggers</MudTh>
+                        <MudTh>Sleep Hours</MudTh>
+                        <MudTh>Actions</MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Data">@context.Date.ToString("dd.MM.yyyy")</MudTd>
-                        <MudTd DataLabel="Stare de spirit">
+                        <MudTd DataLabel="Date">@context.Date.ToString("MM/dd/yyyy")</MudTd>
+                        <MudTd DataLabel="Mood">
                             <div class="d-flex align-center">
                                 <MudIcon Icon="@GetMoodIcon(context.MoodLevel)" 
                                         Color="@GetMoodColor(context.MoodLevel)" 
@@ -250,10 +250,10 @@
                                 @context.MoodLevel / 10
                             </div>
                         </MudTd>
-                        <MudTd DataLabel="Activități">@context.Activities</MudTd>
-                        <MudTd DataLabel="Factori declanșatori">@context.Triggers</MudTd>
-                        <MudTd DataLabel="Ore de somn">@(context.SleepHours?.ToString() ?? "-")</MudTd>
-                        <MudTd DataLabel="Acțiuni">
+                        <MudTd DataLabel="Activities">@context.Activities</MudTd>
+                        <MudTd DataLabel="Triggers">@context.Triggers</MudTd>
+                        <MudTd DataLabel="Sleep Hours">@(context.SleepHours?.ToString() ?? "-")</MudTd>
+                        <MudTd DataLabel="Actions">
                             <MudIconButton Icon="@Icons.Material.Filled.Edit" 
                                          Color="Color.Primary" 
                                          Size="Size.Small"
@@ -278,7 +278,7 @@
            FullWidth="true"
            MaxWidth="MaxWidth.Medium">
     <TitleContent>
-        <MudText Typo="Typo.h6">Adaugă o nouă înregistrare</MudText>
+        <MudText Typo="Typo.h6">Add a new entry</MudText>
     </TitleContent>
     <DialogContent>
         <MudForm @ref="form" @bind-IsValid="@success">
@@ -286,56 +286,56 @@
                 <MudItem xs="12">
                     <MudDatePicker Date="@newEntry.Date"
                                  DateChanged="@(date => newEntry.Date = date ?? DateTime.Now)"
-                                 Label="Data" 
+                                 Label="Date" 
                                  Required="true"
-                                 RequiredError="Data este obligatorie"
+                                 RequiredError="Date is required"
                                  Class="mt-0" />
                 </MudItem>
                 
                 <MudItem xs="12">
                     <MudNumericField @bind-Value="newEntry.MoodLevel" 
-                                   Label="Stare de spirit (1-10)" 
+                                   Label="Mood (1-10)" 
                                    Min="1" 
                                    Max="10" 
                                    Required="true"
-                                   RequiredError="Starea de spirit este obligatorie"
+                                   RequiredError="Mood is required"
                                    Class="mt-0" />
                 </MudItem>
                 
                 <MudItem xs="12">
                     <MudTextField @bind-Value="newEntry.Activities" 
-                                Label="Activități" 
+                                Label="Activities" 
                                 Required="true"
-                                RequiredError="Activitățile sunt obligatorii"
+                                RequiredError="Activities are required"
                                 Class="mt-0" />
                 </MudItem>
                 
                 <MudItem xs="12">
                     <MudTextField @bind-Value="newEntry.Triggers" 
-                                Label="Factori declanșatori" 
+                                Label="Triggers" 
                                 Required="true"
-                                RequiredError="Factorii declanșatori sunt obligatorii"
+                                RequiredError="Triggers are required"
                                 Class="mt-0" />
                 </MudItem>
                 
                 <MudItem xs="12">
                     <MudNumericField @bind-Value="newEntry.SleepHours" 
-                                   Label="Ore de somn" 
+                                   Label="Sleep Hours" 
                                    Min="0" 
                                    Max="24" 
                                    Required="true"
-                                   RequiredError="Orele de somn sunt obligatorii"
+                                   RequiredError="Sleep hours are required"
                                    Class="mt-0" />
                 </MudItem>
             </MudGrid>
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="@(() => showAddDialog = false)">Anulează</MudButton>
+        <MudButton OnClick="@(() => showAddDialog = false)">Cancel</MudButton>
         <MudButton Color="Color.Primary" 
                   OnClick="SaveEntry"
                   Disabled="@(!success)">
-            Salvează
+            Save
         </MudButton>
     </DialogActions>
 </MudDialog>
@@ -345,7 +345,7 @@
            FullWidth="true"
            MaxWidth="MaxWidth.Medium">
     <TitleContent>
-        <MudText Typo="Typo.h6">Editează înregistrarea</MudText>
+        <MudText Typo="Typo.h6">Edit entry</MudText>
     </TitleContent>
     <DialogContent>
         <MudForm @ref="editForm" @bind-IsValid="@editSuccess">
@@ -353,56 +353,56 @@
                 <MudItem xs="12">
                     <MudDatePicker Date="@editingEntry.Date"
                                  DateChanged="@(date => editingEntry.Date = date ?? DateTime.Now)"
-                                 Label="Data" 
+                                 Label="Date" 
                                  Required="true"
-                                 RequiredError="Data este obligatorie"
+                                 RequiredError="Date is required"
                                  Class="mt-0" />
                 </MudItem>
                 
                 <MudItem xs="12">
                     <MudNumericField @bind-Value="editingEntry.MoodLevel" 
-                                   Label="Stare de spirit (1-10)" 
+                                   Label="Mood (1-10)" 
                                    Min="1" 
                                    Max="10" 
                                    Required="true"
-                                   RequiredError="Starea de spirit este obligatorie"
+                                   RequiredError="Mood is required"
                                    Class="mt-0" />
                 </MudItem>
                 
                 <MudItem xs="12">
                     <MudTextField @bind-Value="editingEntry.Activities" 
-                                Label="Activități" 
+                                Label="Activities" 
                                 Required="true"
-                                RequiredError="Activitățile sunt obligatorii"
+                                RequiredError="Activities are required"
                                 Class="mt-0" />
                 </MudItem>
                 
                 <MudItem xs="12">
                     <MudTextField @bind-Value="editingEntry.Triggers" 
-                                Label="Factori declanșatori" 
+                                Label="Triggers" 
                                 Required="true"
-                                RequiredError="Factorii declanșatori sunt obligatorii"
+                                RequiredError="Triggers are required"
                                 Class="mt-0" />
                 </MudItem>
                 
                 <MudItem xs="12">
                     <MudNumericField @bind-Value="editingEntry.SleepHours" 
-                                   Label="Ore de somn" 
+                                   Label="Sleep Hours" 
                                    Min="0" 
                                    Max="24" 
                                    Required="true"
-                                   RequiredError="Orele de somn sunt obligatorii"
+                                   RequiredError="Sleep hours are required"
                                    Class="mt-0" />
                 </MudItem>
             </MudGrid>
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="@(() => showEditDialog = false)">Anulează</MudButton>
+        <MudButton OnClick="@(() => showEditDialog = false)">Cancel</MudButton>
         <MudButton Color="Color.Primary" 
                   OnClick="UpdateEntry"
                   Disabled="@(!editSuccess)">
-            Salvează
+            Save
         </MudButton>
     </DialogActions>
 </MudDialog>
@@ -410,14 +410,14 @@
 <MudDialog @bind-IsVisible="showDeleteDialog" 
            Options="dialogOptions">
     <TitleContent>
-        <MudText Typo="Typo.h6">Confirmare ștergere</MudText>
+        <MudText Typo="Typo.h6">Confirm deletion</MudText>
     </TitleContent>
     <DialogContent>
-        <MudText>Sigur doriți să ștergeți această înregistrare?</MudText>
+        <MudText>Are you sure you want to delete this entry?</MudText>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="@(() => showDeleteDialog = false)">Anulează</MudButton>
-        <MudButton Color="Color.Error" OnClick="ConfirmDelete">Șterge</MudButton>
+        <MudButton OnClick="@(() => showDeleteDialog = false)">Cancel</MudButton>
+        <MudButton Color="Color.Error" OnClick="ConfirmDelete">Delete</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -456,7 +456,7 @@
             
             if (!user.Identity?.IsAuthenticated ?? true)
             {
-                errorMessage = "Nu sunteți autentificat. Vă rugăm să vă autentificați pentru a vedea înregistrările.";
+                errorMessage = "You are not signed in. Please sign in to view your entries.";
                 return;
             }
             
@@ -464,7 +464,7 @@
             
             if (string.IsNullOrEmpty(userId))
             {
-                errorMessage = "Nu s-a putut identifica utilizatorul. Vă rugăm să vă autentificați din nou.";
+                errorMessage = "Could not identify user. Please sign in again.";
                 return;
             }
             
@@ -478,12 +478,12 @@
             }
             else
             {
-                errorMessage = $"Eroare la încărcarea înregistrărilor: {response.StatusCode}";
+                errorMessage = $"Error loading entries: {response.StatusCode}";
             }
         }
         catch (Exception ex)
         {
-            errorMessage = $"Eroare: {ex.Message}";
+            errorMessage = $"Error: {ex.Message}";
         }
         finally
         {
@@ -498,7 +498,7 @@
         {
             if (!success)
             {
-                Snackbar.Add("Vă rugăm să completați toate câmpurile obligatorii", Severity.Warning);
+                Snackbar.Add("Please fill in all required fields", Severity.Warning);
                 return;
             }
 
@@ -507,7 +507,7 @@
             
             if (string.IsNullOrEmpty(userId))
             {
-                Snackbar.Add("Nu s-a putut identifica utilizatorul", Severity.Error);
+                Snackbar.Add("Could not identify user", Severity.Error);
                 return;
             }
             
@@ -517,7 +517,7 @@
             
             if (response.IsSuccessStatusCode)
             {
-                Snackbar.Add("Înregistrarea a fost adăugată cu succes", Severity.Success);
+                Snackbar.Add("Entry added successfully", Severity.Success);
                 showAddDialog = false;
                 newEntry = new();
                 await LoadEntries();
@@ -525,12 +525,12 @@
             else
             {
                 var error = await response.Content.ReadAsStringAsync();
-                Snackbar.Add($"Eroare la salvarea înregistrării: {error}", Severity.Error);
+                Snackbar.Add($"Error saving entry: {error}", Severity.Error);
             }
         }
         catch (Exception ex)
         {
-            Snackbar.Add($"Eroare: {ex.Message}", Severity.Error);
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
         }
     }
 
@@ -555,7 +555,7 @@
         {
             if (!editSuccess)
             {
-                Snackbar.Add("Vă rugăm să completați toate câmpurile obligatorii", Severity.Warning);
+                Snackbar.Add("Please fill in all required fields", Severity.Warning);
                 return;
             }
 
@@ -563,19 +563,19 @@
             
             if (response.IsSuccessStatusCode)
             {
-                Snackbar.Add("Înregistrarea a fost actualizată cu succes", Severity.Success);
+                Snackbar.Add("Entry updated successfully", Severity.Success);
                 showEditDialog = false;
                 await LoadEntries();
             }
             else
             {
                 var error = await response.Content.ReadAsStringAsync();
-                Snackbar.Add($"Eroare la actualizarea înregistrării: {error}", Severity.Error);
+                Snackbar.Add($"Error updating entry: {error}", Severity.Error);
             }
         }
         catch (Exception ex)
         {
-            Snackbar.Add($"Eroare: {ex.Message}", Severity.Error);
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
         }
     }
 
@@ -595,19 +595,19 @@
             
             if (response.IsSuccessStatusCode)
             {
-                Snackbar.Add("Înregistrarea a fost ștearsă cu succes", Severity.Success);
+                Snackbar.Add("Entry deleted successfully", Severity.Success);
                 showDeleteDialog = false;
                 await LoadEntries();
             }
             else
             {
                 var error = await response.Content.ReadAsStringAsync();
-                Snackbar.Add($"Eroare la ștergerea înregistrării: {error}", Severity.Error);
+                Snackbar.Add($"Error deleting entry: {error}", Severity.Error);
             }
         }
         catch (Exception ex)
         {
-            Snackbar.Add($"Eroare: {ex.Message}", Severity.Error);
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
         }
     }
 
@@ -616,7 +616,7 @@
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
 
-        return entry.Date.ToString("dd.MM.yyyy").Contains(searchString, StringComparison.OrdinalIgnoreCase)
+        return entry.Date.ToString("MM/dd/yyyy").Contains(searchString, StringComparison.OrdinalIgnoreCase)
             || entry.MoodLevel.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase)
             || (entry.Activities?.Contains(searchString, StringComparison.OrdinalIgnoreCase) ?? false)
             || (entry.Triggers?.Contains(searchString, StringComparison.OrdinalIgnoreCase) ?? false)
@@ -655,5 +655,3 @@
         };
     }
 }
-
-

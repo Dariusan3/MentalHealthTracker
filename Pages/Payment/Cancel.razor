@@ -1,7 +1,7 @@
 @page "/payment/cancel"
 @inject NavigationManager NavigationManager
 
-<PageTitle>Plată anulată</PageTitle>
+<PageTitle>Payment Cancelled</PageTitle>
 
 <div class="container my-5">
     <div class="row justify-content-center">
@@ -11,17 +11,17 @@
                     <div class="mb-4">
                         <i class="fas fa-times-circle text-danger" style="font-size: 5rem;"></i>
                     </div>
-                    <h2 class="card-title">Plată anulată</h2>
-                    <p class="card-text lead">Plata ta a fost anulată.</p>
-                    <p>Nicio sumă nu a fost retrasă din contul tău.</p>
+                    <h2 class="card-title">Payment Cancelled</h2>
+                    <p class="card-text lead">Your payment has been cancelled.</p>
+                    <p>No amount has been charged to your account.</p>
                     
                     <hr>
                     
                     <button class="btn btn-primary mt-3" @onclick="GoToSubscription">
-                        Încearcă din nou
+                        Try again
                     </button>
                     <button class="btn btn-outline-secondary mt-3 ms-2" @onclick="GoToHome">
-                        Înapoi la pagina principală
+                        Back to home
                     </button>
                 </div>
             </div>
@@ -39,4 +39,4 @@
     {
         NavigationManager.NavigateTo("/");
     }
-} 
+}

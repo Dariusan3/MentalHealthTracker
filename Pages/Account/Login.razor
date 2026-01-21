@@ -10,13 +10,13 @@
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<PageTitle>Mental Health Tracker - Autentificare</PageTitle>
+<PageTitle>Mental Health Tracker - Sign In</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex justify-center align-center" Style="height: 80vh;">
     <MudCard Elevation="3" Class="rounded-lg pa-4" Style="width: 100%;">
         <MudCardHeader>
             <CardHeaderContent>
-                <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">Autentificare</MudText>
+                <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">Sign In</MudText>
             </CardHeaderContent>
         </MudCardHeader>
         <MudCardContent>
@@ -41,7 +41,7 @@
                     </MudItem>
                     <MudItem xs="12">
                         <MudTextField @bind-Value="loginRequest.Password" 
-                                     Label="Parolă" 
+                                     Label="Password" 
                                      Variant="Variant.Outlined" 
                                      InputType="@passwordInputType"
                                      Adornment="Adornment.End" 
@@ -51,7 +51,7 @@
                     </MudItem>
                     <MudItem xs="12">
                         <div class="d-flex justify-space-between align-center">
-                            <MudCheckBox @bind-Value="loginRequest.RememberMe" Label="Ține-mă minte" Color="Color.Primary" />
+                            <MudCheckBox @bind-Value="loginRequest.RememberMe" Label="Remember me" Color="Color.Primary" />
                         </div>
                     </MudItem>
                     <MudItem xs="12">
@@ -64,11 +64,11 @@
                             @if (isProcessing)
                             {
                                 <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-                                <MudText Class="ms-2">Se procesează...</MudText>
+                                <MudText Class="ms-2">Processing...</MudText>
                             }
                             else
                             {
-                                <MudText>Autentificare</MudText>
+                                <MudText>Sign In</MudText>
                             }
                         </MudButton>
                     </MudItem>
@@ -76,9 +76,9 @@
             </EditForm>
         </MudCardContent>
         <MudCardActions Class="d-flex justify-center pb-4 flex-column">
-            <MudText Align="Align.Center" Class="mb-2">Nu ai cont?</MudText>
+            <MudText Align="Align.Center" Class="mb-2">Don't have an account?</MudText>
             <a href="/account/register" class="mud-button-root mud-button mud-button-outlined mud-button-outlined-secondary mud-button-filled-size-medium mud-ripple mud-width-full">
-                <span class="mud-button-label">Înregistrează-te</span>
+                <span class="mud-button-label">Sign Up</span>
             </a>
         </MudCardActions>
     </MudCard>
@@ -96,20 +96,20 @@
     
     protected override async Task OnInitializedAsync()
     {
-        // Verifică dacă utilizatorul este deja autentificat
+        // Check if user is already authenticated
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         if (authState.User.Identity?.IsAuthenticated == true)
         {
-            Console.WriteLine("Login.razor: Utilizator deja autentificat. Redirecționare către /home.");
+            Console.WriteLine("Login.razor: User already authenticated. Redirecting to /home.");
             NavigationManager.NavigateTo("/home", forceLoad: true);
-            return; // Ieșim din metodă după redirecționare
+            return;
         }
 
-        // Obținem parametrul returnUrl din query string, dacă există
+        // Get returnUrl parameter from query string if exists
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         if (Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var returnUrlValues))
         {
-            // Păstrăm returnUrl pentru redirecționare (poate fi folosit după autentificarea reușită)
+            // Keep returnUrl for redirect after successful authentication
         }
     }
     
@@ -128,55 +128,45 @@
         
         try
         {
-            Console.WriteLine($"Încercare de autentificare pentru {loginRequest.Email}");
+            Console.WriteLine($"Attempting authentication for {loginRequest.Email}");
             var response = await Http.PostAsJsonAsync("api/account/login", loginRequest);
-            Console.WriteLine($"Răspuns autentificare: {response.StatusCode}");
+            Console.WriteLine($"Authentication response: {response.StatusCode}");
             
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
                 if (result != null && result.Success)
                 {
-                    // Adăugăm un mesaj de diagnosticare
-                    successMessage = "Autentificare reușită! Redirecționare...";
-                    Console.WriteLine($"Autentificare reușită pentru {loginRequest.Email}");
+                    successMessage = "Authentication successful! Redirecting...";
+                    Console.WriteLine($"Authentication successful for {loginRequest.Email}");
                     Console.WriteLine($"UserId: {result.UserId}, UserName: {result.UserName}");
                     StateHasChanged();
                     
                     try
                     {
-                        // Încercăm să folosim funcțiile din authHelpers
                         await JSRuntime.InvokeVoidAsync("eval", $@"
-                            console.log('Salvare stare autentificare...');
+                            console.log('Saving authentication state...');
                             if (window.authHelpers && window.authHelpers.saveAuthState) {{
                                 window.authHelpers.saveAuthState(true, '{result.UserId}', '{result.UserName}');
-                                console.log('Stare salvată cu succes!');
+                                console.log('State saved successfully!');
                             }} else {{
-                                console.error('authHelpers.saveAuthState nu este disponibil!');
-                                // Salvăm direct în localStorage ca fallback
+                                console.error('authHelpers.saveAuthState not available!');
                                 localStorage.setItem('isAuthenticated', 'true');
                                 localStorage.setItem('userId', '{result.UserId}');
                                 localStorage.setItem('userName', '{result.UserName}');
                             }}
                             
-                            // Setăm flag-ul de autentificare reușită
                             sessionStorage.setItem('login_success', 'true');
                         ");
                         
-                        // Verificăm starea de autentificare
                         await JSRuntime.InvokeVoidAsync("checkAuthStatus");
-                        
-                        // Așteptăm puțin pentru a permite setarea cookie-urilor
                         await Task.Delay(1000);
-                        
-                        // Redirecționăm către pagina principală cu forțarea reîncărcării
                         NavigationManager.NavigateTo("/", true);
                     }
                     catch (Exception ex)
                     {
-                        // Dacă apelul JavaScript eșuează, folosim doar redirecționarea
-                        errorMessage = $"Eroare JavaScript: {ex.Message}. Se redirecționează...";
-                        Console.WriteLine($"Eroare JavaScript: {ex.Message}");
+                        errorMessage = $"JavaScript error: {ex.Message}. Redirecting...";
+                        Console.WriteLine($"JavaScript error: {ex.Message}");
                         StateHasChanged();
                         await Task.Delay(1000);
                         NavigationManager.NavigateTo("/", true);
@@ -187,23 +177,23 @@
             else
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Eroare autentificare: {errorContent}");
+                Console.WriteLine($"Authentication error: {errorContent}");
                 
                 try
                 {
                     var errorResult = await response.Content.ReadFromJsonAsync<ErrorResponse>();
-                    errorMessage = errorResult?.Message ?? "Eroare la autentificare. Te rugăm să încerci din nou.";
+                    errorMessage = errorResult?.Message ?? "Authentication error. Please try again.";
                 }
                 catch
                 {
-                    errorMessage = $"Eroare la autentificare: {response.StatusCode}";
+                    errorMessage = $"Authentication error: {response.StatusCode}";
                 }
             }
         }
         catch (Exception ex)
         {
-            errorMessage = $"Eroare la autentificare: {ex.Message}";
-            Console.WriteLine($"Excepție la autentificare: {ex.Message}");
+            errorMessage = $"Authentication error: {ex.Message}";
+            Console.WriteLine($"Authentication exception: {ex.Message}");
         }
         
         isProcessing = false;
@@ -230,4 +220,4 @@
         public bool Success { get; set; }
         public string Message { get; set; } = "";
     }
-} 
+}

@@ -52,8 +52,8 @@ namespace MentalHealthTracker.Services
                                 Currency = "ron",
                                 ProductData = new SessionLineItemPriceDataProductDataOptions
                                 {
-                                    Name = "Abonament Premium MentalHealthTracker",
-                                    Description = "Acces nelimitat la chatbot-ul nostru bazat pe AI"
+                                    Name = "MentalHealthTracker Premium Subscription",
+                                    Description = "Unlimited access to our AI-powered chatbot"
                                 },
                                 Recurring = new SessionLineItemPriceDataRecurringOptions
                                 {
@@ -75,13 +75,13 @@ namespace MentalHealthTracker.Services
                 var service = new SessionService();
                 var session = await service.CreateAsync(options);
 
-                // Stochează ID-ul sesiunii pentru a-l verifica ulterior
+                // Store session ID for later verification
                 var user = await _userManager.FindByIdAsync(userId);
                 if (user != null)
                 {
                     user.StripeCustomerId = session.CustomerId;
                     await _userManager.UpdateAsync(user);
-                    Console.WriteLine($"Sesiune Stripe creată pentru utilizatorul {user.Email} cu ID: {session.Id}");
+                    Console.WriteLine($"Stripe session created for user {user.Email} with ID: {session.Id}");
                 }
 
                 return session.Url;
@@ -102,13 +102,13 @@ namespace MentalHealthTracker.Services
                 
                 if (session == null)
                 {
-                    Console.WriteLine($"Sesiunea {sessionId} nu a fost găsită");
+                    Console.WriteLine($"Session {sessionId} not found");
                     return false;
                 }
 
                 if (session.PaymentStatus != "paid")
                 {
-                    Console.WriteLine($"Sesiunea {sessionId} nu este plătită. Status: {session.PaymentStatus}");
+                    Console.WriteLine($"Session {sessionId} is not paid. Status: {session.PaymentStatus}");
                     return false;
                 }
 
@@ -117,7 +117,7 @@ namespace MentalHealthTracker.Services
                 
                 if (user == null)
                 {
-                    Console.WriteLine($"Utilizatorul cu ID {userId} nu a fost găsit");
+                    Console.WriteLine($"User with ID {userId} not found");
                     return false;
                 }
 
@@ -128,18 +128,18 @@ namespace MentalHealthTracker.Services
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
-                    Console.WriteLine($"Abonament activat cu succes pentru utilizatorul {user.Email}");
+                    Console.WriteLine($"Subscription successfully activated for user {user.Email}");
                     return true;
                 }
                 else
                 {
-                    Console.WriteLine($"Eroare la actualizarea utilizatorului: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                    Console.WriteLine($"Error updating user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Eroare la verificarea sesiunii: {ex.Message}");
+                Console.WriteLine($"Error verifying session: {ex.Message}");
                 return false;
             }
         }
@@ -160,20 +160,20 @@ namespace MentalHealthTracker.Services
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) return false;
 
-            // Verifică dacă utilizatorul este abonat, în acest caz nu decrementăm
+            // Check if user is subscribed, in which case we don't decrement
             if (user.IsSubscribed) return true;
 
-            // Verifică dacă trebuie să resetăm contorul de mesaje (a trecut cel puțin o zi)
+            // Check if we need to reset message counter (at least one day has passed)
             if (user.LastMessageResetDate == null || user.LastMessageResetDate.Value.Date < DateTime.Today)
             {
                 user.MessagesLeftToday = 5;
                 user.LastMessageResetDate = DateTime.Today;
             }
 
-            // Verifică dacă utilizatorul mai are mesaje disponibile
+            // Check if user has messages available
             if (user.MessagesLeftToday <= 0) return false;
 
-            // Decrementează numărul de mesaje și salvează
+            // Decrement message count and save
             user.MessagesLeftToday--;
             await _userManager.UpdateAsync(user);
             return true;

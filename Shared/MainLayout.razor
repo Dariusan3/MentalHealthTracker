@@ -19,7 +19,7 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h6" Class="ml-3">Mental Health Tracker</MudText>
         <MudSpacer />
-        <MudIconButton Icon="@(ThemeService.IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)" Color="Color.Inherit" OnClick="ToggleTheme" Title="Comută tema" />
+        <MudIconButton Icon="@(ThemeService.IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)" Color="Color.Inherit" OnClick="ToggleTheme" Title="Toggle theme" />
         <LoginDisplay />
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
@@ -48,7 +48,7 @@
         SetThemeFromService();
         StateHasChanged();
 
-        // Actualizăm și profilul utilizatorului
+        // Update user profile as well
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         if (authState.User.Identity?.IsAuthenticated == true)
         {
@@ -69,17 +69,43 @@
     {
         Palette = new PaletteLight()
         {
-            Primary = Colors.Blue.Darken1,
-            Secondary = Colors.DeepPurple.Accent2,
-            AppbarBackground = Colors.Blue.Darken3,
-            Background = Colors.Grey.Lighten5,
+            Primary = "#3B82F6",
+            Secondary = "#60A5FA",
+            Tertiary = "#F97316",
+            AppbarBackground = "#3B82F6",
+            Background = "#F8FAFC",
+            TextPrimary = "#1E293B",
+            TextSecondary = "#475569",
+            DrawerBackground = "#FFFFFF",
+            Surface = "#FFFFFF"
         },
         PaletteDark = new PaletteDark()
         {
-            Primary = Colors.Blue.Lighten1,
-            Secondary = Colors.DeepPurple.Accent1,
-            AppbarBackground = Colors.Blue.Darken4,
-            Background = Colors.Grey.Darken4,
+            Primary = "#60A5FA",
+            Secondary = "#3B82F6",
+            Tertiary = "#FB923C",
+            AppbarBackground = "#1E293B",
+            Background = "#0F172A",
+            TextPrimary = "#F1F5F9",
+            TextSecondary = "#CBD5E1",
+            DrawerBackground = "#1E293B",
+            Surface = "#1E293B"
+        },
+        Typography = new Typography()
+        {
+            Default = new Default() { FontFamily = new[] { "Raleway", "Helvetica", "Arial", "sans-serif" } },
+            H1 = new H1() { FontFamily = new[] { "Lora", "serif" }, FontWeight = 700 },
+            H2 = new H2() { FontFamily = new[] { "Lora", "serif" }, FontWeight = 600 },
+            H3 = new H3() { FontFamily = new[] { "Lora", "serif" }, FontWeight = 600 },
+            H4 = new H4() { FontFamily = new[] { "Lora", "serif" }, FontWeight = 600 },
+            H5 = new H5() { FontFamily = new[] { "Lora", "serif" }, FontWeight = 500 },
+            H6 = new H6() { FontFamily = new[] { "Lora", "serif" }, FontWeight = 500 },
+            Body1 = new Body1() { FontFamily = new[] { "Raleway", "sans-serif" }, FontSize = "1rem", LineHeight = 1.5 },
+            Body2 = new Body2() { FontFamily = new[] { "Raleway", "sans-serif" }, FontSize = ".875rem", LineHeight = 1.43 },
+            Button = new Button() { FontFamily = new[] { "Raleway", "sans-serif" }, FontWeight = 600, TextTransform = "none" },
+            Caption = new Caption() { FontFamily = new[] { "Raleway", "sans-serif" } },
+            Subtitle1 = new Subtitle1() { FontFamily = new[] { "Raleway", "sans-serif" }, FontWeight = 600 },
+            Subtitle2 = new Subtitle2() { FontFamily = new[] { "Raleway", "sans-serif" }, FontWeight = 500 }
         }
     };
 
@@ -88,7 +114,7 @@
         await base.OnInitializedAsync();
         ThemeService.OnThemeChanged += OnThemeChanged;
         
-        // Verificăm și aplicăm tema salvată
+        // Check and apply saved theme
         var currentAuthState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         if (currentAuthState.User.Identity?.IsAuthenticated == true)
         {
@@ -108,12 +134,12 @@
         
         SetThemeFromService();
         
-        // Verificăm starea de autentificare
+        // Check authentication status
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         _isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
         _userName = authState.User.Identity?.Name ?? "";
         
-        Console.WriteLine($"OnInitializedAsync: Autentificat: {_isAuthenticated}, Utilizator: {_userName}");
+        Console.WriteLine($"OnInitializedAsync: Authenticated: {_isAuthenticated}, User: {_userName}");
     }
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -122,38 +148,38 @@
         {
             try
             {
-                // Verificăm starea de autentificare din JavaScript
+                // Check auth status from JavaScript
                 await JSRuntime.InvokeVoidAsync("checkAuthStatus");
                 
-                // Verificăm starea de autentificare din .NET
+                // Check auth status from .NET
                 var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
                 _isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
                 _userName = authState.User.Identity?.Name ?? "";
                 
-                Console.WriteLine($"OnAfterRenderAsync: Autentificat: {_isAuthenticated}, Utilizator: {_userName}");
+                Console.WriteLine($"OnAfterRenderAsync: Authenticated: {_isAuthenticated}, User: {_userName}");
                 
-                // Verificăm dacă avem informații de autentificare în localStorage
+                // Check if we have auth info in localStorage
                 var localAuthState = await JSRuntime.InvokeAsync<AuthState>("authHelpers.getLocalAuthState");
                 var triedRefresh = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "tried_refresh") == "true";
                 
                 if (localAuthState.IsAuthenticated && !triedRefresh && !_isAuthenticated)
                 {
-                    Console.WriteLine($"Stare autentificare găsită în localStorage dar nu în sesiune: {localAuthState.UserName}");
+                    Console.WriteLine($"Auth state found in localStorage but not in session: {localAuthState.UserName}");
                     
-                    // Setăm flag-ul pentru a evita bucla infinită
+                    // Set flag to avoid infinite loop
                     await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "tried_refresh", "true");
                     
-                    // Forțăm reîmprospătarea sesiunii
+                    // Force session refresh
                     await JSRuntime.InvokeVoidAsync("forceAuthRefresh");
                     
-                    // Ștergem flag-ul după 5 secunde
+                    // Remove flag after 5 seconds
                     await Task.Delay(5000);
                     await JSRuntime.InvokeVoidAsync("sessionStorage.removeItem", "tried_refresh");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Eroare în OnAfterRenderAsync: {ex.Message}");
+                Console.WriteLine($"Error in OnAfterRenderAsync: {ex.Message}");
             }
         }
     }
@@ -174,10 +200,15 @@
         {
             AppTheme.Palette = new PaletteLight()
             {
-                Primary = Colors.Blue.Darken1,
-                Secondary = Colors.DeepPurple.Accent2,
-                AppbarBackground = Colors.Blue.Darken3,
-                Background = Colors.Grey.Lighten5,
+                Primary = "#3B82F6",
+                Secondary = "#60A5FA",
+                Tertiary = "#F97316",
+                AppbarBackground = "#3B82F6",
+                Background = "#F8FAFC",
+                TextPrimary = "#1E293B",
+                TextSecondary = "#475569",
+                DrawerBackground = "#FFFFFF",
+                Surface = "#FFFFFF"
             };
         }
     }

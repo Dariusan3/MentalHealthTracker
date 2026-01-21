@@ -154,47 +154,51 @@
 @using Microsoft.AspNetCore.Components.Web
 @using System.Security.Claims
 @using MentalHealthTracker.Services
+@using MentalHealthTracker.Models
+@using Microsoft.AspNetCore.Identity
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject StripeService StripeService
+@inject UserManager<ApplicationUser> UserManager
 
-<PageTitle>Abonament Premium</PageTitle>
+<PageTitle>Premium Subscription</PageTitle>
 
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-lg-7 col-md-9">
             <div class="glass-card">
                 <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h2 class="mb-0 fw-bold" style="letter-spacing:1px;">Abonament Premium</h2>
+                    <h2 class="mb-0 fw-bold" style="letter-spacing:1px;">Premium Subscription</h2>
                     @if (isSubscribed)
                     {
                         <span class="premium-badge"><i class="fas fa-crown me-2"></i>Premium</span>
                     }
                 </div>
                 <div class="benefit-card mb-4">
-                    <div class="benefit-title">Ce primești cu Premium?</div>
+                    <div class="benefit-title">What you get with Premium?</div>
                     <ul class="benefit-list">
-                        <li class="benefit-item"><span class="benefit-icon text-warning"><i class="fas fa-infinity"></i></span>Conversații nelimitate cu chatbot-ul AI</li>
-                        <li class="benefit-item"><span class="benefit-icon text-primary"><i class="fas fa-bolt"></i></span>Fără limită zilnică de mesaje</li>
-                        <li class="benefit-item"><span class="benefit-icon text-success"><i class="fas fa-star"></i></span>Acces prioritar la funcții noi</li>
-                        <li class="benefit-item"><span class="benefit-icon text-info"><i class="fas fa-headset"></i></span>Suport tehnic prioritar</li>
+                        <li class="benefit-item"><span class="benefit-icon text-warning"><i class="fas fa-infinity"></i></span>Unlimited conversations with AI chatbot</li>
+                        <li class="benefit-item"><span class="benefit-icon text-primary"><i class="fas fa-bolt"></i></span>No daily message limit</li>
+                        <li class="benefit-item"><span class="benefit-icon text-success"><i class="fas fa-star"></i></span>Priority access to new features</li>
+                        <li class="benefit-item"><span class="benefit-icon text-info"><i class="fas fa-headset"></i></span>Priority technical support</li>
                     </ul>
                 </div>
                 <div class="price-card mb-4">
-                    <div class="price-title">9,99 RON</div>
-                    <div class="price-sub">/ lună</div>
+                    <div class="price-title">$9.99</div>
+                    <div class="price-sub">/ month</div>
                     @if (isSubscribed)
                     {
                         <div class="alert alert-success text-center mb-0">
-                            <h5 class="alert-heading mb-1">Ești deja abonat!</h5>
-                            <p class="mb-0">Te bucuri deja de toate beneficiile Premium.<br />Mulțumim pentru susținere!</p>
+                            <h5 class="alert-heading mb-1">You're already subscribed!</h5>
+                            <p class="mb-0">You're already enjoying all Premium benefits.<br />Thank you for your support!</p>
                         </div>
                     }
                     else
                     {
                         <button @onclick="GoToCheckout" class="stripe-btn w-100 mb-2" disabled="@isLoading">
-                            <span><i class="fab fa-stripe-s"></i> Abonează-te cu Stripe</span>
+                            <span><i class="fab fa-stripe-s"></i> Subscribe with Stripe</span>
                             @if (isLoading)
                             {
                                 <span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>
@@ -209,20 +213,20 @@
                     </div>
                 }
                 <div class="plan-status">
-                    <h5 class="mb-2">Planul tău actual</h5>
+                    <h5 class="mb-2">Your Current Plan</h5>
                     @if (isSubscribed)
                     {
                         <h5 class="text-success mb-1"><i class="fas fa-crown me-2"></i>Premium</h5>
-                        <p class="mb-0">Ai acces nelimitat la toate funcționalitățile.</p>
+                        <p class="mb-0">You have unlimited access to all features.</p>
                     }
                     else
                     {
-                        <h5 class="mb-1">Plan gratuit</h5>
+                        <h5 class="mb-1">Free Plan</h5>
                     }
                 </div>
                 <div class="info-card mt-3">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/6/62/Stripe_Logo%2C_revised_2016.png" class="stripe-logo" alt="Stripe" />
-                    <small class="text-muted ms-2">Plățile sunt procesate în siguranță prin Stripe. Te poți dezabona oricând din contul tău.</small>
+                    <small class="text-muted ms-2">Payments are securely processed through Stripe. You can cancel anytime from your account.</small>
                 </div>
             </div>
         </div>
@@ -244,24 +248,27 @@
     {
         try
         {
-            var response = await Http.GetAsync("api/payment/subscription-status");
-            if (response.IsSuccessStatusCode)
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            
+            if (user.Identity?.IsAuthenticated == true)
             {
-                var result = await response.Content.ReadFromJsonAsync<SubscriptionStatus>();
-                if (result != null)
+                var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!string.IsNullOrEmpty(userId))
                 {
-                    isSubscribed = result.IsSubscribed;
-                    messagesLeftToday = result.MessagesLeftToday;
+                    var appUser = await UserManager.FindByIdAsync(userId);
+                    if (appUser != null)
+                    {
+                        isSubscribed = appUser.IsSubscribed;
+                        messagesLeftToday = appUser.MessagesLeftToday;
+                    }
                 }
-            }
-            else
-            {
-                errorMessage = "Nu am putut obține statusul abonamentului.";
             }
         }
         catch (Exception ex)
         {
-            errorMessage = $"Eroare: {ex.Message}";
+            Console.WriteLine($"Error GetSubscriptionStatus: {ex.Message}");
+            errorMessage = $"Error: {ex.Message}";
         }
     }
 
@@ -272,28 +279,39 @@
             isLoading = true;
             errorMessage = string.Empty;
 
-            var response = await Http.PostAsync("api/payment/create-checkout-session", null);
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
             
-            if (response.IsSuccessStatusCode)
+            if (user.Identity?.IsAuthenticated != true)
             {
-                var result = await response.Content.ReadFromJsonAsync<CheckoutSessionResult>();
-                if (result != null && !string.IsNullOrEmpty(result.Url))
-                {
-                    NavigationManager.NavigateTo(result.Url);
-                }
-                else
-                {
-                    errorMessage = "Nu am putut obține URL-ul de plată.";
-                }
+                errorMessage = "You must be signed in to subscribe. Please sign in.";
+                return;
+            }
+
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var email = user.FindFirst(ClaimTypes.Email)?.Value ?? user.FindFirst(ClaimTypes.Name)?.Value;
+            
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(email))
+            {
+                errorMessage = "Could not retrieve user data.";
+                return;
+            }
+
+            var sessionUrl = await StripeService.CreateCheckoutSessionAsync(userId, email);
+            
+            if (!string.IsNullOrEmpty(sessionUrl))
+            {
+                NavigationManager.NavigateTo(sessionUrl, forceLoad: true);
             }
             else
             {
-                errorMessage = "Eroare la crearea sesiunii de plată.";
+                errorMessage = "Could not get payment URL.";
             }
         }
         catch (Exception ex)
         {
-            errorMessage = $"Eroare: {ex.Message}";
+            Console.WriteLine($"Error GoToCheckout: {ex.Message}");
+            errorMessage = $"Error: {ex.Message}";
         }
         finally
         {
@@ -309,6 +327,8 @@
 
     private class CheckoutSessionResult
     {
+        public bool Success { get; set; }
         public string Url { get; set; }
+        public string Message { get; set; }
     }
-} 
+}

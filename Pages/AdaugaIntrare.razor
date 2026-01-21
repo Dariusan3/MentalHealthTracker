@@ -12,56 +12,56 @@
 @inject ISnackbar Snackbar
 @attribute [Authorize]
 
-<PageTitle>Mental Health Tracker - Adaugă înregistrare</PageTitle>
+<PageTitle>Mental Health Tracker - Add Entry</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
     <MudPaper Class="pa-4" Elevation="3">
-        <MudText Typo="Typo.h4" Class="mb-4">Adaugă o nouă înregistrare</MudText>
+        <MudText Typo="Typo.h4" Class="mb-4">Add New Entry</MudText>
 
         <MudForm @ref="form" @bind-IsValid="@success">
             <MudGrid>
                 <MudItem xs="12">
                     <MudDatePicker Date="@entry.Date"
                                  DateChanged="@(date => entry.Date = date ?? DateTime.Now)"
-                                 Label="Data" 
+                                 Label="Date" 
                                  Required="true"
-                                 RequiredError="Data este obligatorie"
+                                 RequiredError="Date is required"
                                  Class="mt-0" />
                 </MudItem>
                 
                 <MudItem xs="12">
                     <MudNumericField @bind-Value="entry.MoodLevel" 
-                                   Label="Stare de spirit (1-10)" 
+                                   Label="Mood Level (1-10)" 
                                    Min="1" 
                                    Max="10" 
                                    Required="true"
-                                   RequiredError="Starea de spirit este obligatorie"
+                                   RequiredError="Mood level is required"
                                    Class="mt-0" />
                 </MudItem>
                 
                 <MudItem xs="12">
                     <MudTextField @bind-Value="entry.Activities" 
-                                Label="Activități" 
+                                Label="Activities" 
                                 Required="true"
-                                RequiredError="Activitățile sunt obligatorii"
+                                RequiredError="Activities are required"
                                 Class="mt-0" />
                 </MudItem>
                 
                 <MudItem xs="12">
                     <MudTextField @bind-Value="entry.Triggers" 
-                                Label="Factori declanșatori" 
+                                Label="Triggers" 
                                 Required="true"
-                                RequiredError="Factorii declanșatori sunt obligatorii"
+                                RequiredError="Triggers are required"
                                 Class="mt-0" />
                 </MudItem>
                 
                 <MudItem xs="12">
                     <MudNumericField @bind-Value="entry.SleepHours" 
-                                   Label="Ore de somn" 
+                                   Label="Sleep Hours" 
                                    Min="0" 
                                    Max="24" 
                                    Required="true"
-                                   RequiredError="Orele de somn sunt obligatorii"
+                                   RequiredError="Sleep hours are required"
                                    Class="mt-0" />
                 </MudItem>
 
@@ -70,7 +70,7 @@
                               Color="Color.Secondary"
                               OnClick="@(() => NavigationManager.NavigateTo("/jurnal"))"
                               Disabled="@isLoading">
-                        Anulează
+                        Cancel
                     </MudButton>
                     <MudButton Variant="Variant.Filled" 
                               Color="Color.Primary"
@@ -80,7 +80,7 @@
                         {
                             <MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true" Class="mr-2" />
                         }
-                        Salvează
+                        Save
                     </MudButton>
                 </MudItem>
             </MudGrid>
@@ -100,38 +100,38 @@
         {
             if (!success)
             {
-                Snackbar.Add("Vă rugăm să completați toate câmpurile obligatorii", Severity.Warning);
+                Snackbar.Add("Please fill in all required fields", Severity.Warning);
                 return;
             }
 
-            // Validare suplimentară
+            // Additional validation
             if (entry.Date == default)
             {
-                Snackbar.Add("Data este obligatorie", Severity.Warning);
+                Snackbar.Add("Date is required", Severity.Warning);
                 return;
             }
 
             if (entry.MoodLevel < 1 || entry.MoodLevel > 10)
             {
-                Snackbar.Add("Starea de spirit trebuie să fie între 1 și 10", Severity.Warning);
+                Snackbar.Add("Mood level must be between 1 and 10", Severity.Warning);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(entry.Activities))
             {
-                Snackbar.Add("Activitățile sunt obligatorii", Severity.Warning);
+                Snackbar.Add("Activities are required", Severity.Warning);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(entry.Triggers))
             {
-                Snackbar.Add("Factorii declanșatori sunt obligatorii", Severity.Warning);
+                Snackbar.Add("Triggers are required", Severity.Warning);
                 return;
             }
 
             if (!entry.SleepHours.HasValue || entry.SleepHours < 0 || entry.SleepHours > 24)
             {
-                Snackbar.Add("Orele de somn trebuie să fie între 0 și 24", Severity.Warning);
+                Snackbar.Add("Sleep hours must be between 0 and 24", Severity.Warning);
                 return;
             }
 
@@ -142,7 +142,7 @@
             
             if (string.IsNullOrEmpty(userId))
             {
-                Snackbar.Add("Nu s-a putut identifica utilizatorul", Severity.Error);
+                Snackbar.Add("Could not identify user", Severity.Error);
                 return;
             }
             
@@ -152,22 +152,22 @@
             
             if (response.IsSuccessStatusCode)
             {
-                Snackbar.Add("Înregistrarea a fost adăugată cu succes", Severity.Success);
+                Snackbar.Add("Entry added successfully", Severity.Success);
                 NavigationManager.NavigateTo("/jurnal");
             }
             else
             {
                 var error = await response.Content.ReadAsStringAsync();
-                Snackbar.Add($"Eroare la salvarea înregistrării: {error}", Severity.Error);
+                Snackbar.Add($"Error saving entry: {error}", Severity.Error);
             }
         }
         catch (Exception ex)
         {
-            Snackbar.Add($"Eroare: {ex.Message}", Severity.Error);
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
         }
         finally
         {
             isLoading = false;
         }
     }
-} 
+}

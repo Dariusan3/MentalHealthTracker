@@ -9,26 +9,26 @@
 
 <AuthorizeView>
     <Authorized>
-        <MudAlert Severity="Severity.Success" Class="mb-2">Autentificat ca: @context.User.Identity?.Name</MudAlert>
+        <MudAlert Severity="Severity.Success" Class="mb-2">Signed in as: @context.User.Identity?.Name</MudAlert>
         <MudNavMenu>
-            <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Acasă</MudNavLink>
-            <MudNavLink Href="jurnal" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Book">Jurnal</MudNavLink>
-            <MudNavLink Href="statistici" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.BarChart">Statistici</MudNavLink>
-            <MudNavLink Href="resurse" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LibraryBooks">Resurse</MudNavLink>
-            <MudNavLink Href="profil" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">Profil</MudNavLink>
-            <MudNavLink Href="aichat" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.SmartToy">Chat AI</MudNavLink>
-            <MudNavLink Href="subscription" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Star">Upgrade la Premium</MudNavLink>
+            <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+            <MudNavLink Href="jurnal" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Book">Journal</MudNavLink>
+            <MudNavLink Href="statistici" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.BarChart">Statistics</MudNavLink>
+            <MudNavLink Href="resurse" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LibraryBooks">Resources</MudNavLink>
+            <MudNavLink Href="profil" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">Profile</MudNavLink>
+            <MudNavLink Href="aichat" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.SmartToy">AI Chat</MudNavLink>
+            <MudNavLink Href="subscription" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Star">Upgrade to Premium</MudNavLink>
             
             <MudDivider />
-            <MudNavLink OnClick="ForceLogout" Icon="@Icons.Material.Filled.ExitToApp" Class="mud-error-text">Deconectare</MudNavLink>
+            <MudNavLink OnClick="ForceLogout" Icon="@Icons.Material.Filled.ExitToApp" Class="mud-error-text">Logout</MudNavLink>
         </MudNavMenu>
     </Authorized>
     <NotAuthorized>
-        <MudAlert Severity="Severity.Success" Class="mb-2">Nu sunteți autentificat</MudAlert>
+        <MudAlert Severity="Severity.Success" Class="mb-2">Not signed in</MudAlert>
         <MudNavMenu>
-            <MudNavLink Href="/home" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Acasă</MudNavLink>
-            <MudNavLink Href="account/login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Login">Autentificare</MudNavLink>
-            <MudNavLink Href="account/register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PersonAdd">Înregistrare</MudNavLink>
+            <MudNavLink Href="/home" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+            <MudNavLink Href="account/login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Login">Login</MudNavLink>
+            <MudNavLink Href="account/register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PersonAdd">Register</MudNavLink>
         </MudNavMenu>
     </NotAuthorized>
 </AuthorizeView>
@@ -39,18 +39,18 @@
     {
         if (firstRender)
         {
-            // Forțăm reîncărcarea componentei când se schimbă URL-ul
+            // Force component reload when URL changes
             NavigationManager.LocationChanged += (sender, e) => StateHasChanged();
         }
     }
     
     private async Task ForceLogout()
     {
-        // Afișăm un mesaj de confirmare
-        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Sigur doriți să vă deconectați?");
+        // Show confirmation message
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to log out?");
         if (!confirmed) return;
         
-        // Forțăm deconectarea folosind JavaScript
+        // Force logout using JavaScript
         await JSRuntime.InvokeVoidAsync("forceLogout");
     }
     

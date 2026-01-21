@@ -22,30 +22,30 @@ namespace MentalHealthTracker.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Serviciul de resetare zilnică a mesajelor a fost pornit.");
+            _logger.LogInformation("Daily message reset service started.");
 
-            // Calculăm timpul până la următoarea resetare (miezul nopții)
+            // Calculate time until next reset (midnight)
             var now = DateTime.Now;
             var nextMidnight = now.Date.AddDays(1);
             var timeUntilMidnight = nextMidnight - now;
 
-            // Așteptăm până la miezul nopții
+            // Wait until midnight
             await Task.Delay(timeUntilMidnight, stoppingToken);
 
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    // Resetăm contoarele de mesaje
+                    // Reset message counters
                     await ResetDailyMessageCounters();
-                    _logger.LogInformation("Resetare zilnică a contoarelor de mesaje efectuată cu succes la {time}", DateTime.Now);
+                    _logger.LogInformation("Daily message counters reset successfully at {time}", DateTime.Now);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Eroare la resetarea contoarelor de mesaje");
+                    _logger.LogError(ex, "Error resetting message counters");
                 }
 
-                // Așteptăm 24 de ore până la următoarea resetare
+                // Wait 24 hours until next reset
                 await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
             }
         }

@@ -8,13 +8,13 @@
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
 
-<PageTitle>Mental Health Tracker - Înregistrare</PageTitle>
+<PageTitle>Mental Health Tracker - Sign Up</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex justify-center align-center" Style="height: 90vh;">
     <MudCard Elevation="3" Class="rounded-lg pa-4" Style="width: 100%;">
         <MudCardHeader>
             <CardHeaderContent>
-                <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">Înregistrare cont nou</MudText>
+                <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">Create New Account</MudText>
             </CardHeaderContent>
         </MudCardHeader>
         <MudCardContent>
@@ -28,13 +28,13 @@
                 <MudGrid>
                     <MudItem xs="12" sm="6">
                         <MudTextField @bind-Value="registerRequest.FirstName" 
-                                     Label="Nume" 
+                                     Label="First Name" 
                                      Variant="Variant.Outlined" 
                                      Required="true" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
                         <MudTextField @bind-Value="registerRequest.LastName" 
-                                     Label="Prenume" 
+                                     Label="Last Name" 
                                      Variant="Variant.Outlined" 
                                      Required="true" />
                     </MudItem>
@@ -47,18 +47,18 @@
                     </MudItem>
                     <MudItem xs="12">
                         <MudTextField @bind-Value="registerRequest.Password" 
-                                     Label="Parolă" 
+                                     Label="Password" 
                                      Variant="Variant.Outlined" 
                                      InputType="@passwordInputType"
                                      Adornment="Adornment.End" 
                                      AdornmentIcon="@passwordIcon" 
                                      OnAdornmentClick="TogglePasswordVisibility"
                                      Required="true"
-                                     HelperText="Parola trebuie să aibă cel puțin 6 caractere" />
+                                     HelperText="Password must be at least 6 characters" />
                     </MudItem>
                     <MudItem xs="12">
                         <MudTextField @bind-Value="registerRequest.ConfirmPassword" 
-                                     Label="Confirmă parola" 
+                                     Label="Confirm Password" 
                                      Variant="Variant.Outlined" 
                                      InputType="@passwordInputType"
                                      Adornment="Adornment.End" 
@@ -68,9 +68,9 @@
                     </MudItem>
                     <MudItem xs="12">
                         <MudDatePicker @bind-Date="registerRequest.DateOfBirth" 
-                                      Label="Data nașterii" 
+                                      Label="Date of Birth" 
                                       Variant="Variant.Outlined"
-                                      Placeholder="Selectează data nașterii"
+                                      Placeholder="Select date of birth"
                                       YearSelector />
                     </MudItem>
                     <MudItem xs="12">
@@ -83,11 +83,11 @@
                             @if (isProcessing)
                             {
                                 <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-                                <MudText Class="ms-2">Se procesează...</MudText>
+                                <MudText Class="ms-2">Processing...</MudText>
                             }
                             else
                             {
-                                <MudText>Înregistrare</MudText>
+                                <MudText>Sign Up</MudText>
                             }
                         </MudButton>
                     </MudItem>
@@ -95,9 +95,9 @@
             </EditForm>
         </MudCardContent>
         <MudCardActions Class="d-flex justify-center pb-4 flex-column">
-            <MudText Align="Align.Center" Class="mb-2">Ai deja cont?</MudText>
+            <MudText Align="Align.Center" Class="mb-2">Already have an account?</MudText>
             <a href="/account/login" class="mud-button-root mud-button mud-button-outlined mud-button-outlined-secondary mud-button-filled-size-medium mud-ripple mud-width-full">
-                <span class="mud-button-label">Autentifică-te</span>
+                <span class="mud-button-label">Sign In</span>
             </a>
         </MudCardActions>
     </MudCard>
@@ -128,36 +128,48 @@
         try
         {
             var response = await Http.PostAsJsonAsync("api/account/register", registerRequest);
+            var content = await response.Content.ReadAsStringAsync();
+            
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadFromJsonAsync<RegisterResponse>();
-                if (result != null && result.Success)
+                try 
                 {
-                    try
+                    var result = System.Text.Json.JsonSerializer.Deserialize<RegisterResponse>(content, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (result != null && result.Success)
                     {
-                        // Setăm flag-ul de autentificare reușită
-                        await JSRuntime.InvokeVoidAsync("authHelpers.setLoginSuccess");
-                        
-                        // Redirecționăm către pagina principală
-                        NavigationManager.NavigateTo("/", true);
+                        try
+                        {
+                            await JSRuntime.InvokeVoidAsync("authHelpers.setLoginSuccess");
+                            NavigationManager.NavigateTo("/", true);
+                        }
+                        catch (Exception)
+                        {
+                            NavigationManager.NavigateTo("/", true);
+                        }
+                        return;
                     }
-                    catch (Exception)
-                    {
-                        // Dacă apelul JavaScript eșuează, folosim doar redirecționarea
-                        NavigationManager.NavigateTo("/", true);
-                    }
-                    return;
+                }
+                catch (System.Text.Json.JsonException jsonEx)
+                {
+                    errorMessage = $"Error processing response: {jsonEx.Message}. Raw response: {content.Substring(0, Math.Min(content.Length, 100))}";
                 }
             }
             else
             {
-                var errorResult = await response.Content.ReadFromJsonAsync<ErrorResponse>();
-                errorMessage = errorResult?.Message ?? "Eroare la înregistrare. Te rugăm să încerci din nou.";
+                try 
+                {
+                    var errorResult = System.Text.Json.JsonSerializer.Deserialize<ErrorResponse>(content, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    errorMessage = (errorResult?.Message ?? "Registration error.") + (string.IsNullOrEmpty(errorResult?.Detail) ? "" : $" Details: {errorResult.Detail}");
+                }
+                catch (System.Text.Json.JsonException)
+                {
+                    errorMessage = $"Server error ({response.StatusCode}). Raw response: {content.Substring(0, Math.Min(content.Length, 100))}";
+                }
             }
         }
         catch (Exception ex)
         {
-            errorMessage = $"Eroare la înregistrare: {ex.Message}";
+            errorMessage = $"Unexpected registration error: {ex.Message}";
         }
         
         isProcessing = false;
@@ -184,5 +196,6 @@
     {
         public bool Success { get; set; }
         public string Message { get; set; } = "";
+        public string Detail { get; set; } = "";
     }
-} 
+}

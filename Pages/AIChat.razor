@@ -10,24 +10,24 @@
 @inject ISnackbar Snackbar
 @inject IServiceProvider ServiceProvider
 
-<PageTitle>Chat AI</PageTitle>
+<PageTitle>AI Chat</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
     <div class="d-flex justify-space-between align-center mb-4">
-        <MudText Typo="Typo.h4">Chat cu AI (local)</MudText>
+        <MudText Typo="Typo.h4">AI Chat (local)</MudText>
         <div class="d-flex gap-2">
             <MudButton Variant="Variant.Outlined" 
                       Color="Color.Error" 
                       StartIcon="@Icons.Material.Filled.Delete"
                       OnClick="OpenDeleteDialog"
                       Disabled="@(Conversations.Count == 0)">
-                Șterge conversația
+                Delete conversation
             </MudButton>
             <MudButton Variant="Variant.Outlined" 
                       Color="Color.Primary" 
                       StartIcon="@Icons.Material.Filled.Add"
                       OnClick="CreateNewChat">
-                Conversație nouă
+                New conversation
             </MudButton>
         </div>
     </div>
@@ -49,7 +49,7 @@
                                             Class="mr-2" />
                                     <MudText Typo="Typo.body1" 
                                             Color="@(msg.Role == "user" ? Color.Primary : Color.Secondary)">
-                                        <b>@(msg.Role == "user" ? "Tu:" : "AI:")</b>
+                                        <b>@(msg.Role == "user" ? "You:" : "AI:")</b>
                                     </MudText>
                                     <MudText Typo="Typo.caption" Class="ml-auto" Color="Color.Secondary">
                                         @msg.Timestamp.ToLocalTime().ToString("HH:mm")
@@ -62,7 +62,7 @@
                     <MudDivider Class="my-2" />
                     <div class="d-flex gap-2">
                         <MudTextField @bind-Value="UserInput" 
-                                    Placeholder="Scrie un mesaj..." 
+                                    Placeholder="Type a message..." 
                                     FullWidth="true" 
                                     OnKeyDown="OnKeyDown" 
                                     Disabled="@IsStreaming"
@@ -73,7 +73,7 @@
                                  Variant="Variant.Filled" 
                                  Color="Color.Primary"
                                  StartIcon="@Icons.Material.Filled.Send">
-                            Trimite
+                            Send
                         </MudButton>
                     </div>
                     
@@ -81,10 +81,10 @@
                     {
                         <MudAlert Severity="Severity.Warning" Class="mt-3">
                             @ErrorMessage
-                            @if (ErrorMessage.Contains("limita zilnică"))
+                            @if (ErrorMessage.Contains("daily limit"))
                             {
                                 <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="GoToSubscription" Class="ml-2">
-                                    Abonează-te acum
+                                    Subscribe now
                                 </MudButton>
                             }
                         </MudAlert>
@@ -97,14 +97,14 @@
 
 <MudDialog @bind-IsVisible="ShowDeleteDialog" Options="dialogOptions">
     <TitleContent>
-        <MudText Typo="Typo.h6">Ștergere conversație</MudText>
+        <MudText Typo="Typo.h6">Delete conversation</MudText>
     </TitleContent>
     <DialogContent>
-        <MudText>Sigur doriți să ștergeți conversația curentă?</MudText>
+        <MudText>Are you sure you want to delete the current conversation?</MudText>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="CloseDeleteDialog">Anulează</MudButton>
-        <MudButton Color="Color.Error" OnClick="DeleteCurrentChat">Șterge</MudButton>
+        <MudButton OnClick="CloseDeleteDialog">Cancel</MudButton>
+        <MudButton Color="Color.Error" OnClick="DeleteCurrentChat">Delete</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -144,8 +144,8 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Eroare la inițializare: {ex.Message}");
-            Snackbar.Add("A apărut o eroare la încărcarea conversațiilor", Severity.Error);
+            Console.WriteLine($"Error during initialization: {ex.Message}");
+            Snackbar.Add("An error occurred while loading conversations", Severity.Error);
         }
     }
 
@@ -155,7 +155,7 @@
         {
             Conversations = await ChatHistoryService.GetUserConversationsAsync();
             
-            // Încarcă mesajele pentru fiecare conversație
+            // Load messages for each conversation
             foreach (var conversation in Conversations)
             {
                 var fullConversation = await ChatHistoryService.GetConversationWithMessagesAsync(conversation.Id);
@@ -171,7 +171,7 @@
             }
             else
             {
-                // Selectează ultima conversație activă
+                // Select the last active conversation
                 ActiveTabIndex = 0;
             }
             
@@ -179,8 +179,8 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Eroare la încărcarea conversațiilor: {ex.Message}");
-            Snackbar.Add("A apărut o eroare la încărcarea conversațiilor", Severity.Error);
+            Console.WriteLine($"Error loading conversations: {ex.Message}");
+            Snackbar.Add("An error occurred while loading conversations", Severity.Error);
         }
     }
 
@@ -221,13 +221,13 @@
                     ActiveTabIndex = Math.Min(ActiveTabIndex, Conversations.Count - 1);
                 }
                 
-                Snackbar.Add("Conversația a fost ștearsă cu succes", Severity.Success);
+                Snackbar.Add("Conversation deleted successfully", Severity.Success);
             }
         }
         catch (Exception ex)
         {
-            Snackbar.Add("A apărut o eroare la ștergerea conversației", Severity.Error);
-            Console.WriteLine($"Eroare la ștergerea conversației: {ex.Message}");
+            Snackbar.Add("An error occurred while deleting the conversation", Severity.Error);
+            Console.WriteLine($"Error deleting conversation: {ex.Message}");
         }
         finally
         {
@@ -248,7 +248,7 @@
         var currentConversation = Conversations[ActiveTabIndex];
         if (currentConversation == null) return;
 
-        // Verifică dacă utilizatorul poate trimite un mesaj
+        // Check if user can send a message
         var (isAllowed, errorMessage) = await ChatHistoryService.CanUserSendMessageAsync();
         if (!isAllowed)
         {
@@ -258,7 +258,7 @@
 
         ErrorMessage = string.Empty;
 
-        // Salvează mesajul userului
+        // Save user message
         await ChatHistoryService.AddMessageToConversationAsync(currentConversation.Id, "user", UserInput);
 
         var localInput = UserInput;
@@ -266,21 +266,32 @@
         IsStreaming = true;
         CurrentStreaming = string.Empty;
 
-        // Obține răspunsul AI
-        Response = await AIChatService.GetChatResponseOllamaAsync(localInput, ServiceProvider);
-
-        // Salvează răspunsul AI
-        await ChatHistoryService.AddMessageToConversationAsync(currentConversation.Id, "assistant", Response);
-
-        // Reîncarcă conversația pentru a afișa noile mesaje
-        var updatedConversation = await ChatHistoryService.GetConversationWithMessagesAsync(currentConversation.Id);
-        if (updatedConversation != null)
+        // Get AI response
+        try
         {
-            Conversations[ActiveTabIndex] = updatedConversation;
-        }
+            Response = await AIChatService.GetChatResponseOllamaAsync(localInput, ServiceProvider);
 
-        IsStreaming = false;
-        StateHasChanged();
+            // Save AI response
+            await ChatHistoryService.AddMessageToConversationAsync(currentConversation.Id, "assistant", Response);
+
+            // Reload conversation to display new messages
+            var updatedConversation = await ChatHistoryService.GetConversationWithMessagesAsync(currentConversation.Id);
+            if (updatedConversation != null)
+            {
+                Conversations[ActiveTabIndex] = updatedConversation;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Error communicating with AI: " + ex.Message;
+            Snackbar.Add("A problem occurred while generating the AI response.", Severity.Error);
+            Console.WriteLine($"Error SendMessage: {ex.Message}");
+        }
+        finally
+        {
+            IsStreaming = false;
+            StateHasChanged();
+        }
     }
 
     private async Task OnKeyDown(KeyboardEventArgs e)

@@ -121,35 +121,48 @@ namespace MentalHealthTracker.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest model)
         {
-            if (!ModelState.IsValid)
+            try 
             {
-                return BadRequest(new { success = false, message = "Date invalide" });
-            }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new { success = false, message = "Date invalide" });
+                }
 
-            if (model.Password != model.ConfirmPassword)
-            {
-                return BadRequest(new { success = false, message = "Parolele nu se potrivesc." });
-            }
+                if (model.Password != model.ConfirmPassword)
+                {
+                    return BadRequest(new { success = false, message = "Parolele nu se potrivesc." });
+                }
 
-            var user = new ApplicationUser
-            {
-                UserName = model.Email,
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                DateOfBirth = model.DateOfBirth,
-                RegisteredDate = DateTime.Now
-            };
+                var user = new ApplicationUser
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    DateOfBirth = model.DateOfBirth,
+                    RegisteredDate = DateTime.Now
+                };
 
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (result.Succeeded)
-            {
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                return Ok(new { success = true, redirectUrl = "/" });
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    return Ok(new { success = true, redirectUrl = "/", message = "Înregistrare reușită" });
+                }
+                else
+                {
+                    return BadRequest(new { success = false, message = string.Join(", ", result.Errors.Select(e => e.Description)) });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest(new { success = false, message = string.Join(", ", result.Errors.Select(e => e.Description)) });
+                _logger.LogError(ex, "Eroare critică la înregistrare");
+                var innerMessage = ex.InnerException?.Message ?? "Fără detalii suplimentare";
+                return StatusCode(500, new { 
+                    success = false, 
+                    message = $"Eroare server la salvarea datelor: {ex.Message}",
+                    detail = innerMessage
+                });
             }
         }
 
@@ -313,8 +326,8 @@ namespace MentalHealthTracker.Controllers
                 // Deconectăm utilizatorul după ștergere
                 await _signInManager.SignOutAsync();
 
-                // Returnăm un răspuns HTTP de redirecționare către pagina de login
-                return Redirect("/account/login");
+                // Returnăm succes pentru ca frontend-ul să poată face redirecționarea
+                return Ok(new { success = true, redirectUrl = "/account/login", message = "Cont șters cu succes" });
             }
             else
             {

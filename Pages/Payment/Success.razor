@@ -1,11 +1,12 @@
 @page "/payment/success"
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
-@inject HttpClient Http
 @using Microsoft.AspNetCore.WebUtilities
 @using MudBlazor
+@using MentalHealthTracker.Services
+@inject StripeService StripeService
 
-<PageTitle>Plată reușită</PageTitle>
+<PageTitle>Payment Successful</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="d-flex justify-center align-center" Style="min-height: 80vh;">
     <MudCard Elevation="8" Class="p-6 rounded-xl text-center animate__animated animate__fadeInUp" Style="max-width: 500px; width: 100%;">
@@ -13,28 +14,28 @@
             @if (isLoading)
             {
                 <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
-                <MudText Typo="Typo.h6" Class="mt-4">Se procesează plata...</MudText>
+                <MudText Typo="Typo.h6" Class="mt-4">Processing payment...</MudText>
             }
             else if (isError)
             {
                 <MudIcon Icon="@Icons.Material.Filled.Error" Color="Color.Error" Size="Size.Large" Class="mb-2" />
                 <MudText Typo="Typo.h6" Color="Color.Error" Class="mb-4">@errorMessage</MudText>
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToSubscription" Class="mt-4">
-                    Încearcă din nou
+                    Try again
                 </MudButton>
             }
             else
             {
                 <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Color="Color.Warning" Size="Size.Large" Class="mb-2 animate__animated animate__tada" />
-                <MudChip Color="Color.Warning" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Star" Class="mb-3" Style="font-size:1.2rem;">Premium activat!</MudChip>
-                <MudText Typo="Typo.h4" Color="Color.Success" Class="mb-2">Plată procesată cu succes!</MudText>
-                <MudText Typo="Typo.h6" Class="mb-2">Îți mulțumim pentru abonare la planul <b>Premium</b>!</MudText>
-                <MudText Typo="Typo.body1" Class="mb-2">Acum te poți bucura de <b>conversații nelimitate</b> cu chatbot-ul nostru.</MudText>
+                <MudChip Color="Color.Warning" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Star" Class="mb-3" Style="font-size:1.2rem;">Premium activated!</MudChip>
+                <MudText Typo="Typo.h4" Color="Color.Success" Class="mb-2">Payment processed successfully!</MudText>
+                <MudText Typo="Typo.h6" Class="mb-2">Thank you for subscribing to the <b>Premium</b> plan!</MudText>
+                <MudText Typo="Typo.body1" Class="mb-2">You can now enjoy <b>unlimited conversations</b> with our chatbot.</MudText>
                 <MudDivider Class="my-3" />
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" OnClick="GoToChat" Class="me-2" StartIcon="@Icons.Material.Filled.Chat">Începe să conversezi</MudButton>
-                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Large" OnClick="GoToHome" StartIcon="@Icons.Material.Filled.Home">Înapoi la pagina principală</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" OnClick="GoToChat" Class="me-2" StartIcon="@Icons.Material.Filled.Chat">Start chatting</MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Large" OnClick="GoToHome" StartIcon="@Icons.Material.Filled.Home">Back to home</MudButton>
                 <MudText Typo="Typo.caption" Class="mt-4 d-block" Color="Color.Info">
-                    <MudIcon Icon="@Icons.Material.Filled.ReceiptLong" Size="Size.Medium" Class="me-1" />Număr tranzacție: <b>@sessionId</b>
+                    <MudIcon Icon="@Icons.Material.Filled.ReceiptLong" Size="Size.Medium" Class="me-1" />Transaction ID: <b>@sessionId</b>
                 </MudText>
             }
         </MudCardContent>
@@ -54,13 +55,13 @@
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("session_id", out var sessionIdValue))
         {
-            sessionId = sessionIdValue;
+            sessionId = sessionIdValue!;
             await VerifyPayment();
         }
         else
         {
             isError = true;
-            errorMessage = "Nu s-a putut găsi ID-ul sesiunii de plată.";
+            errorMessage = "Could not find payment session ID.";
             isLoading = false;
         }
     }
@@ -69,30 +70,22 @@
     {
         try
         {
-            var response = await Http.PostAsync($"api/payment/verify-session/{sessionId}", null);
-            if (response.IsSuccessStatusCode)
+            var result = await StripeService.VerifyAndActivateSubscription(sessionId);
+            if (result)
             {
-                var result = await response.Content.ReadFromJsonAsync<VerifyResponse>();
-                if (result?.Success == true)
-                {
-                    await JSRuntime.InvokeVoidAsync("eval", "if(window.confetti){window.confetti()};");
-                }
-                else
-                {
-                    isError = true;
-                    errorMessage = result?.Message ?? "Nu s-a putut verifica plata.";
-                }
+                await JSRuntime.InvokeVoidAsync("eval", "if(window.confetti){window.confetti()};");
             }
             else
             {
                 isError = true;
-                errorMessage = "Eroare la verificarea plății.";
+                errorMessage = "Could not verify payment. Please contact support.";
             }
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"Error VerifyPayment: {ex.Message}");
             isError = true;
-            errorMessage = $"Eroare: {ex.Message}";
+            errorMessage = $"Error: {ex.Message}";
         }
         finally
         {
@@ -120,4 +113,4 @@
         public bool Success { get; set; }
         public string Message { get; set; } = "";
     }
-} 
+}

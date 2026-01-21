@@ -15,17 +15,17 @@
 @inject ThemeService ThemeService
 @attribute [Authorize]
 
-<PageTitle>Mental Health Tracker - Profil</PageTitle>
+<PageTitle>Mental Health Tracker - Profile</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
     <div class="d-flex justify-space-between align-center mb-4">
-        <MudText Typo="Typo.h3">Profilul meu</MudText>
+        <MudText Typo="Typo.h3">My Profile</MudText>
         <MudButton Variant="Variant.Outlined" 
                   Color="Color.Primary" 
                   StartIcon="@Icons.Material.Filled.ArrowBack"
                   Href="/"
                   Class="ml-auto">
-            Înapoi la pagina principală
+            Back to home
         </MudButton>
     </div>
 
@@ -34,7 +34,7 @@
             <MudCard Elevation="3" Class="rounded-lg">
                 <MudCardHeader>
                     <CardHeaderContent>
-                        <MudText Typo="Typo.h5">Informații personale</MudText>
+                        <MudText Typo="Typo.h5">Personal Information</MudText>
                     </CardHeaderContent>
                     <CardHeaderActions>
                         <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Primary" />
@@ -43,13 +43,13 @@
                 <MudCardContent>
                     @if (userProfile != null)
                     {
-                        <MudTextField @bind-Value="@userProfile.Nume" Label="Nume" Variant="Variant.Outlined" Class="mt-3" />
+                        <MudTextField @bind-Value="@userProfile.Nume" Label="Name" Variant="Variant.Outlined" Class="mt-3" />
                         <MudTextField @bind-Value="@userProfile.Email" Label="Email" Variant="Variant.Outlined" Class="mt-3" />
-                        <MudDatePicker @bind-Date="@userProfile.DataNasterii" Label="Data nașterii" Variant="Variant.Outlined" Class="mt-3" />
+                        <MudDatePicker @bind-Date="@userProfile.DataNasterii" Label="Date of Birth" Variant="Variant.Outlined" Class="mt-3" />
                     }
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@SalveazaModificari">Salvează modificările</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@SalveazaModificari">Save changes</MudButton>
                 </MudCardActions>
             </MudCard>
         </MudItem>
@@ -58,7 +58,7 @@
             <MudCard Elevation="3" Class="rounded-lg">
                 <MudCardHeader>
                     <CardHeaderContent>
-                        <MudText Typo="Typo.h5">Preferințe</MudText>
+                        <MudText Typo="Typo.h5">Preferences</MudText>
                     </CardHeaderContent>
                     <CardHeaderActions>
                         <MudIcon Icon="@Icons.Material.Filled.Settings" Color="Color.Secondary" />
@@ -67,17 +67,17 @@
                 <MudCardContent>
                     @if (userProfile != null)
                     {
-                        <MudSwitch @bind-Value="@userProfile.NotificariZilnice" Color="Color.Primary" Label="Primește notificări zilnice" Class="mt-3" />
-                        <MudSwitch @bind-Value="@userProfile.RapoarteSaptamanale" Color="Color.Primary" Label="Primește rapoarte săptămânale" Class="mt-3" />
-                        <MudTimePicker @bind-Time="@userProfile.OraNotificare" Label="Ora notificării zilnice" Variant="Variant.Outlined" Class="mt-3" />
-                        <MudSelect T="string" Value="@userProfile.Tema" Label="Tema aplicației" Variant="Variant.Outlined" Class="mt-3" ValueChanged="@OnThemeChangedFromProfile">
-                            <MudSelectItem Value='@("light")'>Luminoasă</MudSelectItem>
-                            <MudSelectItem Value='@("dark")'>Întunecată</MudSelectItem>
+                        <MudSwitch @bind-Value="@userProfile.NotificariZilnice" Color="Color.Primary" Label="Receive daily notifications" Class="mt-3" />
+                        <MudSwitch @bind-Value="@userProfile.RapoarteSaptamanale" Color="Color.Primary" Label="Receive weekly reports" Class="mt-3" />
+                        <MudTimePicker @bind-Time="@userProfile.OraNotificare" Label="Daily notification time" Variant="Variant.Outlined" Class="mt-3" />
+                        <MudSelect T="string" Value="@userProfile.Tema" Label="App theme" Variant="Variant.Outlined" Class="mt-3" ValueChanged="@OnThemeChangedFromProfile">
+                            <MudSelectItem Value="@("light")">Light</MudSelectItem>
+                            <MudSelectItem Value="@("dark")">Dark</MudSelectItem>
                         </MudSelect>
                     }
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@SalveazaPreferinte">Salvează preferințele</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@SalveazaPreferinte">Save preferences</MudButton>
                 </MudCardActions>
             </MudCard>
         </MudItem>
@@ -86,7 +86,7 @@
             <MudCard Elevation="3" Class="rounded-lg">
                 <MudCardHeader>
                     <CardHeaderContent>
-                        <MudText Typo="Typo.h5">Status abonament</MudText>
+                        <MudText Typo="Typo.h5">Subscription Status</MudText>
                     </CardHeaderContent>
                     <CardHeaderActions>
                         <MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Warning" />
@@ -96,17 +96,17 @@
                     @if (currentUser != null && currentUser.IsSubscribed)
                     {
                         <MudChip Color="Color.Warning" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Star" Class="mb-2">Premium</MudChip>
-                        <MudText Typo="Typo.h6" Color="Color.Warning">Ai abonament Premium activ!</MudText>
-                        <MudText Typo="Typo.body2" Class="mt-1">Te bucuri de conversații nelimitate cu AI și acces la toate funcționalitățile.</MudText>
+                        <MudText Typo="Typo.h6" Color="Color.Warning">You have an active Premium subscription!</MudText>
+                        <MudText Typo="Typo.body2" Class="mt-1">Enjoy unlimited AI conversations and access to all features.</MudText>
                     }
                     else if (currentUser != null)
                     {
-                        <MudChip Color="Color.Default" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Lock">Gratuit</MudChip>
-                        <MudText Typo="Typo.h6" Color="Color.Default">Cont gratuit</MudText>
-                        <MudText Typo="Typo.body2" Class="mt-1">Ai acces la 5 mesaje/zi în chat. Pentru acces nelimitat, fă upgrade la Premium!</MudText>
-                        <MudButton Variant="Variant.Filled" Color="Color.Warning" Href="/subscription" Class="mt-2">Upgrade la Premium</MudButton>
+                        <MudChip Color="Color.Default" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Lock">Free</MudChip>
+                        <MudText Typo="Typo.h6" Color="Color.Default">Free account</MudText>
+                        <MudText Typo="Typo.body2" Class="mt-1">You have access to 5 messages/day in chat. For unlimited access, upgrade to Premium!</MudText>
+                        <MudButton Variant="Variant.Filled" Color="Color.Warning" Href="/subscription" Class="mt-2">Upgrade to Premium</MudButton>
                         <MudText Typo="Typo.body2" Class="mt-2">
-                            Ți-au mai rămas <strong>@GetMessagesLeftToday()</strong> mesaje pentru astăzi.
+                            You have <strong>@GetMessagesLeftToday()</strong> messages left for today.
                         </MudText>
                     }
                 </MudCardContent>
@@ -117,19 +117,19 @@
             <MudCard Elevation="3" Class="rounded-lg">
                 <MudCardHeader>
                     <CardHeaderContent>
-                        <MudText Typo="Typo.h5">Securitate</MudText>
+                        <MudText Typo="Typo.h5">Security</MudText>
                     </CardHeaderContent>
                     <CardHeaderActions>
                         <MudIcon Icon="@Icons.Material.Filled.Security" Color="Color.Error" />
                     </CardHeaderActions>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudTextField T="string" Label="Parola actuală" Variant="Variant.Outlined" InputType="@passwordInputType" Adornment="Adornment.End" AdornmentIcon="@passwordIcon" OnAdornmentClick="@TogglePasswordVisibility" Class="mt-3" @bind-Value="@currentPassword" />
-                    <MudTextField T="string" Label="Parola nouă" Variant="Variant.Outlined" InputType="@passwordInputType" Adornment="Adornment.End" AdornmentIcon="@passwordIcon" OnAdornmentClick="@TogglePasswordVisibility" Class="mt-3" @bind-Value="@newPassword" />
-                    <MudTextField T="string" Label="Confirmă parola nouă" Variant="Variant.Outlined" InputType="@passwordInputType" Adornment="Adornment.End" AdornmentIcon="@passwordIcon" OnAdornmentClick="@TogglePasswordVisibility" Class="mt-3" @bind-Value="@confirmNewPassword" />
+                    <MudTextField T="string" Label="Current password" Variant="Variant.Outlined" InputType="@passwordInputType" Adornment="Adornment.End" AdornmentIcon="@passwordIcon" OnAdornmentClick="@TogglePasswordVisibility" Class="mt-3" @bind-Value="@currentPassword" />
+                    <MudTextField T="string" Label="New password" Variant="Variant.Outlined" InputType="@passwordInputType" Adornment="Adornment.End" AdornmentIcon="@passwordIcon" OnAdornmentClick="@TogglePasswordVisibility" Class="mt-3" @bind-Value="@newPassword" />
+                    <MudTextField T="string" Label="Confirm new password" Variant="Variant.Outlined" InputType="@passwordInputType" Adornment="Adornment.End" AdornmentIcon="@passwordIcon" OnAdornmentClick="@TogglePasswordVisibility" Class="mt-3" @bind-Value="@confirmNewPassword" />
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@SchimbaParola">Schimbă parola</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@SchimbaParola">Change password</MudButton>
                 </MudCardActions>
             </MudCard>
         </MudItem>
@@ -159,9 +159,6 @@
 
             if (userId != null)
             {
-                // Nu mai verificăm existența utilizatorului în baza de date aici.
-                // Aceasta se face la nivel global în App.razor.
-
                 currentUser = await UserManager.FindByIdAsync(userId);
 
                 if (currentUser != null)
@@ -182,7 +179,7 @@
                         await UserProfileService.CreateOrUpdateProfileAsync(userProfile);
                     }
 
-                    // Aplică tema din profil la inițializare
+                    // Apply theme from profile on initialization
                     if (userProfile.Tema == "dark")
                         ThemeService.SetTheme(true);
                     else if (userProfile.Tema == "light")
@@ -190,22 +187,19 @@
                 }
                 else
                 {
-                     // Acest caz ar trebui gestionat deja de App.razor, dar adăugăm un fallback.
-                    Console.WriteLine("Profil.razor: Utilizator autentificat, dar currentUser este null. Redirecționare la login.");
+                    Console.WriteLine("Profile.razor: Authenticated user, but currentUser is null. Redirecting to login.");
                     NavigationManager.NavigateTo("/account/login", forceLoad: true);
                 }
             }
             else
             {
-                // Acest caz ar trebui gestionat deja de App.razor, dar adăugăm un fallback.
-                Console.WriteLine("Profil.razor: Utilizator autentificat, dar fără ID claim. Redirecționare la login.");
+                Console.WriteLine("Profile.razor: Authenticated user, but no ID claim. Redirecting to login.");
                 NavigationManager.NavigateTo("/account/login", forceLoad: true);
             }
         }
         else
         {
-            // Utilizatorul nu este autentificat - redirecționare la login
-            Console.WriteLine("Profil.razor: Utilizator neautentificat. Redirecționare la login.");
+            Console.WriteLine("Profile.razor: Unauthenticated user. Redirecting to login.");
             NavigationManager.NavigateTo("/account/login", forceLoad: true);
         }
     }
@@ -216,11 +210,11 @@
         {
             userProfile.UltimaActualizare = DateTime.UtcNow;
             await UserProfileService.CreateOrUpdateProfileAsync(userProfile);
-            Snackbar.Add("Informații personale salvate cu succes!", Severity.Success);
+            Snackbar.Add("Personal information saved successfully!", Severity.Success);
         }
         else
         {
-             Snackbar.Add("Eroare la salvarea informațiilor personale.", Severity.Error);
+             Snackbar.Add("Error saving personal information.", Severity.Error);
         }
     }
     
@@ -229,7 +223,6 @@
         if (userProfile != null)
         {
             userProfile.Tema = value;
-            // Nu mai aplicăm tema imediat, se va aplica doar după salvarea preferințelor
         }
     }
 
@@ -241,17 +234,17 @@
             {
                 await UserProfileService.CreateOrUpdateProfileAsync(userProfile);
                 
-                // Aplicăm tema doar după salvarea preferințelor
+                // Apply theme only after saving preferences
                 if (userProfile.Tema == "dark")
                     await ThemeService.SetTheme(true);
                 else if (userProfile.Tema == "light")
                     await ThemeService.SetTheme(false);
                 
-                Snackbar.Add("Preferințele au fost salvate cu succes!", Severity.Success);
+                Snackbar.Add("Preferences saved successfully!", Severity.Success);
             }
             catch (Exception ex)
             {
-                Snackbar.Add("Eroare la salvarea preferințelor: " + ex.Message, Severity.Error);
+                Snackbar.Add("Error saving preferences: " + ex.Message, Severity.Error);
             }
         }
     }
@@ -262,13 +255,13 @@
 
         if (string.IsNullOrWhiteSpace(currentPassword) || string.IsNullOrWhiteSpace(newPassword) || string.IsNullOrWhiteSpace(confirmNewPassword))
         {
-            Snackbar.Add("Toate câmpurile parolei sunt obligatorii.", Severity.Warning);
+            Snackbar.Add("All password fields are required.", Severity.Warning);
             return;
         }
 
         if (newPassword != confirmNewPassword)
         {
-            Snackbar.Add("Noua parolă și confirmarea parolei nu coincid.", Severity.Warning);
+            Snackbar.Add("New password and confirmation do not match.", Severity.Warning);
             return;
         }
 
@@ -276,7 +269,7 @@
 
         if (changePasswordResult.Succeeded)
         {
-            Snackbar.Add("Parola schimbată cu succes!", Severity.Success);
+            Snackbar.Add("Password changed successfully!", Severity.Success);
             currentPassword = string.Empty;
             newPassword = string.Empty;
             confirmNewPassword = string.Empty;
@@ -284,7 +277,7 @@
         else
         {
             var errors = string.Join(", ", changePasswordResult.Errors.Select(e => e.Description));
-            Snackbar.Add($"Eroare la schimbarea parolei: {errors}", Severity.Error);
+            Snackbar.Add($"Error changing password: {errors}", Severity.Error);
         }
     }
 
@@ -304,4 +297,4 @@
             return 0;
         return currentUser.MessagesLeftToday;
     }
-} 
+}

@@ -10,16 +10,16 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @attribute [Authorize]
 
-<PageTitle>Mental Health Tracker - Statistici</PageTitle>
+<PageTitle>Mental Health Tracker - Statistics</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
-    <MudText Typo="Typo.h3" Class="mb-4">Statistici stare de spirit</MudText>
+    <MudText Typo="Typo.h3" Class="mb-4">Mood Statistics</MudText>
 
     @if (isLoading)
     {
         <div class="d-flex flex-column align-center my-8">
             <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
-            <MudText Class="mt-4">Se încarcă statisticile...</MudText>
+            <MudText Class="mt-4">Loading statistics...</MudText>
         </div>
     }
     else if (!string.IsNullOrEmpty(errorMessage))
@@ -29,7 +29,7 @@
                 @errorMessage
             </MudAlert>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ReloadStatistics">
-                Reîncearcă
+                Retry
             </MudButton>
         </MudPaper>
     }
@@ -37,10 +37,10 @@
     {
         <MudPaper Class="pa-4 my-4" Elevation="3">
             <MudAlert Severity="Severity.Info" Variant="Variant.Filled" Class="mb-3">
-                Nu există suficiente date pentru a genera statistici. Adaugă mai multe înregistrări în jurnal.
+                Not enough data to generate statistics. Add more entries to your journal.
             </MudAlert>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="/adauga-intrare">
-                Adaugă o înregistrare
+                Add an entry
             </MudButton>
         </MudPaper>
     }
@@ -49,17 +49,17 @@
         <MudGrid>
             <MudItem xs="12" md="6">
                 <MudPaper Class="pa-4" Elevation="3">
-                    <MudText Typo="Typo.h5">Rezumat</MudText>
+                    <MudText Typo="Typo.h5">Summary</MudText>
                     <MudDivider Class="my-2" />
                     <MudList>
                         <MudListItem Icon="@Icons.Material.Filled.Mood">
-                            Stare de spirit medie: <b>@FormatDouble(statistics.AverageMood)</b> / 10
+                            Average mood: <b>@FormatDouble(statistics.AverageMood)</b> / 10
                         </MudListItem>
                         <MudListItem Icon="@Icons.Material.Filled.CalendarToday">
-                            Număr total de înregistrări: <b>@statistics.EntriesCount</b>
+                            Total entries: <b>@statistics.EntriesCount</b>
                         </MudListItem>
                         <MudListItem Icon="@Icons.Material.Filled.Bedtime">
-                            Media orelor de somn: <b>@FormatDouble(statistics.AverageSleepHours)</b> ore
+                            Average sleep hours: <b>@FormatDouble(statistics.AverageSleepHours)</b> hours
                         </MudListItem>
                     </MudList>
                 </MudPaper>
@@ -67,7 +67,7 @@
             
             <MudItem xs="12" md="6">
                 <MudPaper Class="pa-4" Elevation="3">
-                    <MudText Typo="Typo.h5">Activități frecvente</MudText>
+                    <MudText Typo="Typo.h5">Frequent Activities</MudText>
                     <MudDivider Class="my-2" />
                     @if (statistics.MostCommonActivities != null && statistics.MostCommonActivities.Any())
                     {
@@ -82,14 +82,14 @@
                     }
                     else
                     {
-                        <MudText>Nu există activități înregistrate.</MudText>
+                        <MudText>No activities recorded.</MudText>
                     }
                 </MudPaper>
             </MudItem>
             
             <MudItem xs="12" md="6">
                 <MudPaper Class="pa-4" Elevation="3">
-                    <MudText Typo="Typo.h5">Factori declanșatori frecvenți</MudText>
+                    <MudText Typo="Typo.h5">Common Triggers</MudText>
                     <MudDivider Class="my-2" />
                     @if (statistics.MostCommonTriggers != null && statistics.MostCommonTriggers.Any())
                     {
@@ -104,14 +104,14 @@
                     }
                     else
                     {
-                        <MudText>Nu există factori declanșatori înregistrați.</MudText>
+                        <MudText>No triggers recorded.</MudText>
                     }
                 </MudPaper>
             </MudItem>
             
             <MudItem xs="12" md="6">
                 <MudPaper Class="pa-4" Elevation="3">
-                    <MudText Typo="Typo.h5">Evaluare generală</MudText>
+                    <MudText Typo="Typo.h5">Overall Assessment</MudText>
                     <MudDivider Class="my-2" />
                     
                     @{
@@ -136,7 +136,7 @@
             <MudItem xs="12">
                 <MudPaper Class="pa-4" Elevation="3">
                     <div class="d-flex justify-space-between align-center">
-                        <MudText Typo="Typo.h5">Tendința stării de spirit</MudText>
+                        <MudText Typo="Typo.h5">Mood Trend</MudText>
                         
                         @if (statistics.MoodTrend != null && statistics.MoodTrend.Any())
                         {
@@ -144,7 +144,7 @@
                                       Color="Color.Primary"
                                       OnClick="RegenerateChart"
                                       StartIcon="@Icons.Material.Filled.Refresh">
-                                Reîncarcă graficul
+                                Reload chart
                             </MudButton>
                         }
                     </div>
@@ -154,13 +154,13 @@
                     {
                         <div id="moodTrendChart" style="height: 350px;"></div>
                         <MudText Typo="Typo.caption" Class="mt-2">
-                            * Graficul afișează evoluția stării de spirit în ultimele 30 de zile
+                            * Chart shows mood trends over the last 30 days
                         </MudText>
                     }
                     else
                     {
                         <MudAlert Severity="Severity.Info" Class="mt-3">
-                            Nu există suficiente date pentru a genera graficul tendințelor.
+                            Not enough data to generate the trend chart.
                         </MudAlert>
                     }
                 </MudPaper>
@@ -177,13 +177,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Verificăm starea de autentificare
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
-        var userName = authState.User.Identity?.Name ?? "necunoscut";
-        var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "necunoscut";
+        var userName = authState.User.Identity?.Name ?? "unknown";
+        var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "unknown";
         
-        Console.WriteLine($"Statistici.razor - OnInitializedAsync: Autentificat: {isAuthenticated}, Utilizator: {userName}, ID: {userId}");
+        Console.WriteLine($"Statistics.razor - OnInitializedAsync: Authenticated: {isAuthenticated}, User: {userName}, ID: {userId}");
         
         await LoadStatistics();
     }
@@ -192,16 +191,13 @@
     {
         if (firstRender)
         {
-            Console.WriteLine("Statistici.razor - OnAfterRenderAsync: Prima redare");
-            
-            // Inițializăm scriptul pentru grafice
+            Console.WriteLine("Statistics.razor - OnAfterRenderAsync: First render");
             await InitializeChartScript();
         }
         
-        // Generăm graficul dacă avem date și nu a fost deja inițializat
         if (statistics != null && statistics.MoodTrend != null && statistics.MoodTrend.Any() && !chartInitialized)
         {
-            Console.WriteLine("Statistici.razor - OnAfterRenderAsync: Generăm graficul");
+            Console.WriteLine("Statistics.razor - OnAfterRenderAsync: Generating chart");
             await GenerateCharts();
             chartInitialized = true;
         }
@@ -211,16 +207,14 @@
     {
         try
         {
-            Console.WriteLine("Statistici.razor - InitializeChartScript: Încărcăm Chart.js");
+            Console.WriteLine("Statistics.razor - InitializeChartScript: Loading Chart.js");
             
-            // Verificăm dacă scriptul Chart.js este încărcat
             var chartJsLoaded = await JSRuntime.InvokeAsync<bool>("eval", "typeof Chart !== 'undefined'");
             
             if (!chartJsLoaded)
             {
-                Console.WriteLine("Statistici.razor - InitializeChartScript: Chart.js nu este încărcat, îl încărcăm");
+                Console.WriteLine("Statistics.razor - InitializeChartScript: Chart.js not loaded, loading it now");
                 
-                // Încărcăm Chart.js
                 await JSRuntime.InvokeVoidAsync("eval", @"
                     const script = document.createElement('script');
                     script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
@@ -228,11 +222,11 @@
                 ");
             }
             
-            Console.WriteLine("Statistici.razor - InitializeChartScript: Chart.js încărcat cu succes");
+            Console.WriteLine("Statistics.razor - InitializeChartScript: Chart.js loaded successfully");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Statistici.razor - InitializeChartScript: Eroare la încărcarea Chart.js: {ex.Message}");
+            Console.WriteLine($"Statistics.razor - InitializeChartScript: Error loading Chart.js: {ex.Message}");
         }
     }
 
@@ -242,35 +236,29 @@
         {
             isLoading = true;
             errorMessage = null;
-            statistics = null; // Resetăm complet statisticile pentru a evita afișarea datelor vechi
+            statistics = null;
             
-            // Verificăm starea de autentificare
             var authState = await AuthStateProvider.GetAuthenticationStateAsync();
             var isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
             var userId = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             
             if (!isAuthenticated || string.IsNullOrEmpty(userId))
             {
-                errorMessage = "Nu sunteți autentificat. Vă rugăm să vă autentificați pentru a vedea statisticile.";
-                Console.WriteLine("Statistici.razor - LoadStatistics: Utilizatorul nu este autentificat!");
+                errorMessage = "You are not signed in. Please sign in to view statistics.";
+                Console.WriteLine("Statistics.razor - LoadStatistics: User not authenticated!");
                 NavigationManager.NavigateTo("/Identity/Account/Login", true);
                 return;
             }
             
-            Console.WriteLine($"Statistici.razor - LoadStatistics: Utilizator autentificat cu ID {userId}");
+            Console.WriteLine($"Statistics.razor - LoadStatistics: Authenticated user with ID {userId}");
             
-            // În loc să folosim endpoint-ul de statistici, vom obține toate înregistrările și vom calcula statisticile noi înșine
-            // Aceasta este cea mai sigură metodă pentru a ne asigura că folosim date reale, nu mockup
             await LoadEntriesAndCalculateStatistics(userId);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Statistici.razor - LoadStatistics: Eroare generală: {ex.Message}");
-            Console.WriteLine($"Statistici.razor - LoadStatistics: StackTrace: {ex.StackTrace}");
-            errorMessage = $"Eroare: {ex.Message}";
-            
-            // NU creăm date dummy - vrem doar date reale
-            // CreateDummyStatistics();
+            Console.WriteLine($"Statistics.razor - LoadStatistics: General error: {ex.Message}");
+            Console.WriteLine($"Statistics.razor - LoadStatistics: StackTrace: {ex.StackTrace}");
+            errorMessage = $"Error: {ex.Message}";
         }
         finally
         {
@@ -283,9 +271,8 @@
     {
         try
         {
-            Console.WriteLine("Statistici.razor - LoadEntriesAndCalculateStatistics: Încărcăm toate înregistrările utilizatorului...");
+            Console.WriteLine("Statistics.razor - LoadEntriesAndCalculateStatistics: Loading all user entries...");
             
-            // Încărcăm toate înregistrările utilizatorului fără paginare
             var request = new HttpRequestMessage(HttpMethod.Get, $"api/MoodEntries?pageSize=1000&userId={userId}");
             request.Headers.Add("X-Test-Mode", "true");
             request.Headers.Add("X-Override-Auth", "true");
@@ -297,65 +284,52 @@
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Statistici.razor - LoadEntriesAndCalculateStatistics: Am primit răspuns cu lungimea {content.Length}");
+                Console.WriteLine($"Statistics.razor - LoadEntriesAndCalculateStatistics: Received response with length {content.Length}");
                 
                 try
                 {
-                    // Deserializăm lista de înregistrări
                     var entries = System.Text.Json.JsonSerializer.Deserialize<List<MoodEntry>>(content, 
                         new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                     
                     if (entries != null && entries.Any())
                     {
-                        Console.WriteLine($"Statistici.razor - LoadEntriesAndCalculateStatistics: Am încărcat {entries.Count} înregistrări");
+                        Console.WriteLine($"Statistics.razor - LoadEntriesAndCalculateStatistics: Loaded {entries.Count} entries");
                         
-                        // Listăm câteva înregistrări pentru debug
                         foreach (var entry in entries.Take(3))
                         {
-                            Console.WriteLine($"Înregistrare: ID={entry.Id}, Data={entry.Date}, MoodLevel={entry.MoodLevel}");
+                            Console.WriteLine($"Entry: ID={entry.Id}, Date={entry.Date}, MoodLevel={entry.MoodLevel}");
                         }
                         
-                        // Calculăm statisticile din înregistrările primite
                         CalculateStatisticsFromEntries(entries);
-                        
-                        // Resetăm starea graficului pentru a-l regenera
                         chartInitialized = false;
                     }
                     else
                     {
-                        Console.WriteLine("Statistici.razor - LoadEntriesAndCalculateStatistics: Nu am primit înregistrări valide");
-                        errorMessage = "Nu există înregistrări în baza de date. Adaugă câteva pentru a vedea statistici.";
+                        Console.WriteLine("Statistics.razor - LoadEntriesAndCalculateStatistics: No valid entries received");
+                        errorMessage = "No entries in database. Add some to see statistics.";
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Statistici.razor - LoadEntriesAndCalculateStatistics: Eroare la deserializare: {ex.Message}");
-                    errorMessage = $"Eroare la prelucrarea datelor: {ex.Message}";
-                    
-                    // Încercăm să verificăm conținutul pentru diagnosticare
-                    Console.WriteLine($"Conținut parțial: {content.Substring(0, Math.Min(200, content.Length))}...");
-                    
-                    // Încercăm metodele de rezervă
+                    Console.WriteLine($"Statistics.razor - LoadEntriesAndCalculateStatistics: Deserialization error: {ex.Message}");
+                    errorMessage = $"Error processing data: {ex.Message}";
+                    Console.WriteLine($"Partial content: {content.Substring(0, Math.Min(200, content.Length))}...");
                     await TryAlternativeStatisticsLoading(userId);
                 }
             }
             else
             {
                 var errorText = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Statistici.razor - LoadEntriesAndCalculateStatistics: Eroare HTTP: {response.StatusCode}, {errorText}");
-                errorMessage = $"Eroare la încărcarea datelor: {response.StatusCode}";
-                
-                // Încercăm metodele de rezervă
+                Console.WriteLine($"Statistics.razor - LoadEntriesAndCalculateStatistics: HTTP Error: {response.StatusCode}, {errorText}");
+                errorMessage = $"Error loading data: {response.StatusCode}";
                 await TestApiConnection();
                 await TryAlternativeStatisticsLoading(userId);
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Statistici.razor - LoadEntriesAndCalculateStatistics: Excepție: {ex.Message}");
-            errorMessage = $"Eroare: {ex.Message}";
-            
-            // Încercăm metodele de rezervă
+            Console.WriteLine($"Statistics.razor - LoadEntriesAndCalculateStatistics: Exception: {ex.Message}");
+            errorMessage = $"Error: {ex.Message}";
             await TestApiConnection();
             await TryAlternativeStatisticsLoading(userId);
         }
@@ -365,24 +339,22 @@
     {
         try
         {
-            Console.WriteLine("Statistici.razor - CalculateStatisticsFromEntries: Calculăm statistici din date reale...");
+            Console.WriteLine("Statistics.razor - CalculateStatisticsFromEntries: Calculating statistics from real data...");
             
             if (entries == null || !entries.Any())
             {
-                Console.WriteLine("Statistici.razor - CalculateStatisticsFromEntries: Nu sunt date pentru calcul");
+                Console.WriteLine("Statistics.razor - CalculateStatisticsFromEntries: No data to calculate");
                 return;
             }
 
-            // Folosim toate înregistrările, deoarece MoodEntry nu are proprietatea IsDeleted
             var activeEntries = entries;
             
             if (!activeEntries.Any())
             {
-                Console.WriteLine("Statistici.razor - CalculateStatisticsFromEntries: Nu există înregistrări active");
+                Console.WriteLine("Statistics.razor - CalculateStatisticsFromEntries: No active entries");
                 return;
             }
             
-            // Creăm un obiect nou pentru statistici
             statistics = new StatisticsViewModel
             {
                 EntriesCount = activeEntries.Count(),
@@ -395,7 +367,6 @@
                 MostCommonTriggers = new List<string>()
             };
             
-            // Calculăm tendința stării de spirit pentru ultimele 30 de zile
             var last30Days = activeEntries
                 .Where(e => e.Date >= DateTime.Today.AddDays(-30))
                 .GroupBy(e => e.Date.Date)
@@ -407,12 +378,10 @@
                 .OrderBy(m => m.Date)
                 .ToList();
             
-            // Adăugăm datele în obiectul statistics
             statistics.MoodTrend = last30Days;
             
-            Console.WriteLine($"Statistici.razor - CalculateStatisticsFromEntries: Tendință stare spirit - {last30Days.Count} zile");
+            Console.WriteLine($"Statistics.razor - CalculateStatisticsFromEntries: Mood trend - {last30Days.Count} days");
             
-            // Calculăm activitățile frecvente
             var activities = activeEntries
                 .Where(e => !string.IsNullOrEmpty(e.Activities))
                 .SelectMany(e => e.Activities.Split(',', StringSplitOptions.RemoveEmptyEntries))
@@ -426,9 +395,8 @@
             
             statistics.MostCommonActivities = activities;
             
-            Console.WriteLine($"Statistici.razor - CalculateStatisticsFromEntries: Activități frecvente - {activities.Count} activități");
+            Console.WriteLine($"Statistics.razor - CalculateStatisticsFromEntries: Frequent activities - {activities.Count} activities");
             
-            // Calculăm factorii declanșatori frecvenți
             var triggers = activeEntries
                 .Where(e => !string.IsNullOrEmpty(e.Triggers))
                 .SelectMany(e => e.Triggers.Split(',', StringSplitOptions.RemoveEmptyEntries))
@@ -442,46 +410,44 @@
             
             statistics.MostCommonTriggers = triggers;
             
-            Console.WriteLine($"Statistici.razor - CalculateStatisticsFromEntries: Factori declanșatori - {triggers.Count} factori");
-            
-            Console.WriteLine($"Statistici.razor - CalculateStatisticsFromEntries: Statistici calculate din date reale: AverageMood={statistics.AverageMood}, EntriesCount={statistics.EntriesCount}");
+            Console.WriteLine($"Statistics.razor - CalculateStatisticsFromEntries: Triggers - {triggers.Count} triggers");
+            Console.WriteLine($"Statistics.razor - CalculateStatisticsFromEntries: Statistics calculated from real data: AverageMood={statistics.AverageMood}, EntriesCount={statistics.EntriesCount}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Statistici.razor - CalculateStatisticsFromEntries: Eroare la calculare: {ex.Message}");
-            errorMessage = $"Eroare la calcularea statisticilor: {ex.Message}";
+            Console.WriteLine($"Statistics.razor - CalculateStatisticsFromEntries: Calculation error: {ex.Message}");
+            errorMessage = $"Error calculating statistics: {ex.Message}";
         }
     }
 
     private void CreateDummyStatistics()
     {
-        // NU folosim această metodă pentru a nu afișa date false
-        Console.WriteLine("Statistici.razor - CreateDummyStatistics: Nu se vor crea date mockup!");
+        Console.WriteLine("Statistics.razor - CreateDummyStatistics: No mockup data will be created!");
     }
 
     private async Task TestApiConnection()
     {
         try
         {
-            Console.WriteLine("Statistici.razor - TestApiConnection: Testăm conectivitatea API-ului...");
+            Console.WriteLine("Statistics.razor - TestApiConnection: Testing API connectivity...");
             var testUrl = "api/MoodEntries/test";
             var response = await Http.GetAsync(testUrl);
             
-            Console.WriteLine($"Statistici.razor - TestApiConnection: Răspuns: {response.StatusCode}");
+            Console.WriteLine($"Statistics.razor - TestApiConnection: Response: {response.StatusCode}");
             
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Statistici.razor - TestApiConnection: Conținut: {content}");
+                Console.WriteLine($"Statistics.razor - TestApiConnection: Content: {content}");
             }
             else
             {
-                Console.WriteLine("Statistici.razor - TestApiConnection: API-ul nu răspunde corect");
+                Console.WriteLine("Statistics.razor - TestApiConnection: API not responding correctly");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Statistici.razor - TestApiConnection: Excepție: {ex.Message}");
+            Console.WriteLine($"Statistics.razor - TestApiConnection: Exception: {ex.Message}");
         }
     }
     
@@ -489,66 +455,56 @@
     {
         try
         {
-            Console.WriteLine("Statistici.razor - TryAlternativeStatisticsLoading: Încercăm metoda alternativă...");
+            Console.WriteLine("Statistics.razor - TryAlternativeStatisticsLoading: Trying alternative method...");
             
-            // Încercăm să accesăm endpoint-ul direct cu parametri diferiți
             var request = new HttpRequestMessage(HttpMethod.Get, $"api/MoodEntries?userId={userId}&pageSize=500");
             request.Headers.Add("X-Test-Mode", "true");
             request.Headers.Add("X-Override-Auth", "true");
             request.Headers.Add("X-Requested-With", "XMLHttpRequest");
             request.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
-            request.Headers.Add("X-Force-Load", "true"); // Header special pentru a forța încărcarea
+            request.Headers.Add("X-Force-Load", "true");
             
             var response = await Http.SendAsync(request);
             
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Statistici.razor - TryAlternativeStatisticsLoading: Am primit date, lungime: {content.Length}");
+                Console.WriteLine($"Statistics.razor - TryAlternativeStatisticsLoading: Received data, length: {content.Length}");
                 
                 try
                 {
-                    // Deserializăm lista de înregistrări
                     var entries = System.Text.Json.JsonSerializer.Deserialize<List<MoodEntry>>(content, 
                         new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                     
                     if (entries != null && entries.Any())
                     {
-                        Console.WriteLine($"Statistici.razor - TryAlternativeStatisticsLoading: Am primit {entries.Count} înregistrări");
-                        
-                        // Calculăm manual statisticile
+                        Console.WriteLine($"Statistics.razor - TryAlternativeStatisticsLoading: Received {entries.Count} entries");
                         CalculateStatisticsFromEntries(entries);
                     }
                     else
                     {
-                        Console.WriteLine("Statistici.razor - TryAlternativeStatisticsLoading: Nu am primit înregistrări valide");
-                        errorMessage = "Nu există date în baza de date. Adaugă câteva înregistrări pentru a vedea statistici.";
+                        Console.WriteLine("Statistics.razor - TryAlternativeStatisticsLoading: No valid entries received");
+                        errorMessage = "No data in database. Add some entries to see statistics.";
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Statistici.razor - TryAlternativeStatisticsLoading: Eroare la deserializare: {ex.Message}");
-                    errorMessage = $"Eroare la procesarea datelor: {ex.Message}";
-                    
-                    // Încercăm ultima metodă de rezervă - endpoint-ul de statistici
+                    Console.WriteLine($"Statistics.razor - TryAlternativeStatisticsLoading: Deserialization error: {ex.Message}");
+                    errorMessage = $"Error processing data: {ex.Message}";
                     await TryStatisticsEndpoint();
                 }
             }
             else
             {
-                Console.WriteLine($"Statistici.razor - TryAlternativeStatisticsLoading: Eroare HTTP: {response.StatusCode}");
-                errorMessage = $"Nu s-au putut încărca datele: {response.StatusCode}";
-                
-                // Încercăm ultima metodă de rezervă - endpoint-ul de statistici
+                Console.WriteLine($"Statistics.razor - TryAlternativeStatisticsLoading: HTTP Error: {response.StatusCode}");
+                errorMessage = $"Could not load data: {response.StatusCode}";
                 await TryStatisticsEndpoint();
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Statistici.razor - TryAlternativeStatisticsLoading: Excepție: {ex.Message}");
-            errorMessage = $"Eroare: {ex.Message}";
-            
-            // Încercăm ultima metodă de rezervă - endpoint-ul de statistici
+            Console.WriteLine($"Statistics.razor - TryAlternativeStatisticsLoading: Exception: {ex.Message}");
+            errorMessage = $"Error: {ex.Message}";
             await TryStatisticsEndpoint();
         }
     }
@@ -557,13 +513,11 @@
     {
         try
         {
-            Console.WriteLine("Statistici.razor - TryStatisticsEndpoint: Încercăm să folosim endpoint-ul de statistici...");
+            Console.WriteLine("Statistics.razor - TryStatisticsEndpoint: Trying statistics endpoint...");
             
-            // Adăugăm timestamp pentru a evita cache-ul
             var timestamp = DateTime.Now.Ticks;
             var url = $"api/MoodEntries/Statistics?_={timestamp}";
             
-            // Facem cererea cu headere speciale
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Add("X-Requested-With", "XMLHttpRequest");
             request.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -571,21 +525,20 @@
             request.Headers.Add("X-Override-Auth", "true");
             request.Headers.Add("X-Force-Load", "true");
             
-            Console.WriteLine("Statistici.razor - TryStatisticsEndpoint: Trimit cererea HTTP...");
+            Console.WriteLine("Statistics.razor - TryStatisticsEndpoint: Sending HTTP request...");
             var response = await Http.SendAsync(request);
             
-            Console.WriteLine($"Statistici.razor - TryStatisticsEndpoint: Răspuns primit: {response.StatusCode}");
+            Console.WriteLine($"Statistics.razor - TryStatisticsEndpoint: Response received: {response.StatusCode}");
             
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Statistici.razor - TryStatisticsEndpoint: Conținut primit: {content}");
+                Console.WriteLine($"Statistics.razor - TryStatisticsEndpoint: Content received: {content}");
                 
-                // Verificăm dacă răspunsul conține date mockup
                 if (content.Contains("\"averageMood\":7.5") && content.Contains("\"entriesCount\":10"))
                 {
-                    Console.WriteLine("Statistici.razor - TryStatisticsEndpoint: Am detectat date mockup, nu le vom folosi");
-                    errorMessage = "Serverul a returnat date mockup. Te rugăm să adaugi înregistrări reale în jurnal.";
+                    Console.WriteLine("Statistics.razor - TryStatisticsEndpoint: Detected mockup data, will not use it");
+                    errorMessage = "Server returned mockup data. Please add real entries to your journal.";
                     return;
                 }
                 
@@ -596,35 +549,33 @@
                     
                     if (statistics != null && statistics.EntriesCount > 0)
                     {
-                        Console.WriteLine("Statistici.razor - TryStatisticsEndpoint: Date deserializate cu succes!");
-                        Console.WriteLine($"Statistici.razor - TryStatisticsEndpoint: AverageMood = {statistics.AverageMood}, EntriesCount = {statistics.EntriesCount}");
-                        
-                        // Resetăm starea graficului pentru a-l regenera
+                        Console.WriteLine("Statistics.razor - TryStatisticsEndpoint: Data deserialized successfully!");
+                        Console.WriteLine($"Statistics.razor - TryStatisticsEndpoint: AverageMood = {statistics.AverageMood}, EntriesCount = {statistics.EntriesCount}");
                         chartInitialized = false;
                     }
                     else
                     {
-                        Console.WriteLine("Statistici.razor - TryStatisticsEndpoint: Nu sunt date sau statistici goale");
-                        errorMessage = "Nu există date în baza de date. Adaugă câteva înregistrări pentru a vedea statistici.";
+                        Console.WriteLine("Statistics.razor - TryStatisticsEndpoint: No data or empty statistics");
+                        errorMessage = "No data in database. Add some entries to see statistics.";
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Statistici.razor - TryStatisticsEndpoint: Eroare la deserializare: {ex.Message}");
-                    errorMessage = $"Eroare la procesarea datelor: {ex.Message}";
+                    Console.WriteLine($"Statistics.razor - TryStatisticsEndpoint: Deserialization error: {ex.Message}");
+                    errorMessage = $"Error processing data: {ex.Message}";
                 }
             }
             else
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Statistici.razor - TryStatisticsEndpoint: Eroare HTTP: Status {response.StatusCode}, Conținut: {errorContent}");
-                errorMessage = $"Eroare la încărcarea statisticilor: {response.StatusCode}";
+                Console.WriteLine($"Statistics.razor - TryStatisticsEndpoint: HTTP Error: Status {response.StatusCode}, Content: {errorContent}");
+                errorMessage = $"Error loading statistics: {response.StatusCode}";
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Statistici.razor - TryStatisticsEndpoint: Excepție: {ex.Message}");
-            errorMessage = $"Eroare: {ex.Message}";
+            Console.WriteLine($"Statistics.razor - TryStatisticsEndpoint: Exception: {ex.Message}");
+            errorMessage = $"Error: {ex.Message}";
         }
     }
 
@@ -634,39 +585,35 @@
         {
             if (statistics == null || statistics.MoodTrend == null || !statistics.MoodTrend.Any())
             {
-                Console.WriteLine("Statistici.razor - GenerateCharts: Nu există date pentru grafic");
+                Console.WriteLine("Statistics.razor - GenerateCharts: No data for chart");
                 return;
             }
 
-            // Pregătim datele pentru grafic
             var labels = statistics.MoodTrend.Select(m => m.Date).ToArray();
             var data = statistics.MoodTrend.Select(m => m.AverageMood).ToArray();
 
-            // Verificăm în consolă dacă elementul există
             var elementExists = await JSRuntime.InvokeAsync<bool>("eval", "document.getElementById('moodTrendChart') !== null");
-            Console.WriteLine($"Statistici.razor - GenerateCharts: Verificare container grafic: {elementExists}");
+            Console.WriteLine($"Statistics.razor - GenerateCharts: Chart container check: {elementExists}");
 
             if (!elementExists)
             {
-                Console.WriteLine("Statistici.razor - GenerateCharts: Containerul pentru grafic nu există!");
+                Console.WriteLine("Statistics.razor - GenerateCharts: Chart container does not exist!");
                 return;
             }
 
-            // Apelăm funcția JavaScript pentru a genera graficul
             await JSRuntime.InvokeVoidAsync("chartUtils.createMoodTrendChart", "moodTrendChart", labels, data);
-            Console.WriteLine("Statistici.razor - GenerateCharts: Grafic generat cu succes");
+            Console.WriteLine("Statistics.razor - GenerateCharts: Chart generated successfully");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Statistici.razor - GenerateCharts: Eroare la generarea graficului: {ex.Message}");
+            Console.WriteLine($"Statistics.razor - GenerateCharts: Error generating chart: {ex.Message}");
             
-            // Încercăm o metodă alternativă de generare a graficului
             try
             {
                 await JSRuntime.InvokeVoidAsync("eval", @"
                     setTimeout(function() {
                         if (typeof chartUtils !== 'undefined' && chartUtils.createMoodTrendChart) {
-                            console.log('Reîncercăm generarea graficului după un delay');
+                            console.log('Retrying chart generation after delay');
                             chartUtils.createMoodTrendChart('moodTrendChart', 
                                 " + System.Text.Json.JsonSerializer.Serialize(statistics.MoodTrend.Select(m => m.Date)) + @", 
                                 " + System.Text.Json.JsonSerializer.Serialize(statistics.MoodTrend.Select(m => m.AverageMood)) + @");
@@ -676,14 +623,14 @@
             }
             catch (Exception innerEx)
             {
-                Console.WriteLine($"Statistici.razor - GenerateCharts: Eroare și la metoda alternativă: {innerEx.Message}");
+                Console.WriteLine($"Statistics.razor - GenerateCharts: Alternative method also failed: {innerEx.Message}");
             }
         }
     }
     
     private async Task RegenerateChart()
     {
-        Console.WriteLine("Statistici.razor - RegenerateChart: Regenerăm graficul");
+        Console.WriteLine("Statistics.razor - RegenerateChart: Regenerating chart");
         chartInitialized = false;
         await GenerateCharts();
         chartInitialized = true;
@@ -691,27 +638,24 @@
     
     private async Task ReloadStatistics()
     {
-        Console.WriteLine("Statistici.razor - ReloadStatistics: Reîncărcăm statisticile");
+        Console.WriteLine("Statistics.razor - ReloadStatistics: Reloading statistics");
         chartInitialized = false;
         await LoadStatistics();
     }
     
-    // Helper pentru formatarea numerelor cu zecimale
     private string FormatDouble(double value)
     {
         return value.ToString("0.0");
     }
     
-    // Obține descrierea pentru nivelul mediu de stare de spirit
     private string GetMoodDescription(double moodLevel)
     {
-        if (moodLevel <= 3) return "Stare de spirit negativă";
-        if (moodLevel <= 5) return "Stare de spirit neutră-joasă";
-        if (moodLevel <= 7) return "Stare de spirit neutră-înaltă";
-        return "Stare de spirit pozitivă";
+        if (moodLevel <= 3) return "Negative mood";
+        if (moodLevel <= 5) return "Low-neutral mood";
+        if (moodLevel <= 7) return "High-neutral mood";
+        return "Positive mood";
     }
     
-    // Obține culoarea pentru nivelul mediu de stare de spirit
     private MudBlazor.Color GetMoodColor(double moodLevel)
     {
         if (moodLevel <= 3) return MudBlazor.Color.Error;
@@ -720,7 +664,6 @@
         return MudBlazor.Color.Success;
     }
     
-    // Obține iconița pentru nivelul mediu de stare de spirit
     private string GetMoodIcon(double moodLevel)
     {
         if (moodLevel <= 3) return Icons.Material.Filled.SentimentVeryDissatisfied;
@@ -729,15 +672,14 @@
         return Icons.Material.Filled.SentimentVerySatisfied;
     }
     
-    // Obține o recomandare bazată pe nivelul mediu de stare de spirit
     private string GetRecommendation(double moodLevel)
     {
         if (moodLevel <= 3)
-            return "Nivelul tău de stare de spirit este scăzut. Consideră să vorbești cu un specialist în sănătate mentală și să acorzi mai multă atenție activităților care îți aduc bucurie.";
+            return "Your mood level is low. Consider talking to a mental health professional and pay more attention to activities that bring you joy.";
         if (moodLevel <= 5)
-            return "Starea ta de spirit este sub medie. Încearcă să incluzi mai multe activități plăcute în programul tău zilnic și acordă atenție factorilor care îți influențează negativ starea.";
+            return "Your mood is below average. Try to include more pleasant activities in your daily schedule and pay attention to factors that negatively affect your mood.";
         if (moodLevel <= 7)
-            return "Starea ta de spirit este bună. Continuă să menții un echilibru între activitățile zilnice și acordă atenție gestionării factorilor de stres.";
-        return "Starea ta de spirit este excelentă! Continuă să menții obiceiurile pozitive și împărtășește bucuria ta cu cei din jur.";
+            return "Your mood is good. Continue to maintain balance between daily activities and pay attention to managing stress factors.";
+        return "Your mood is excellent! Continue to maintain positive habits and share your joy with those around you.";
     }
-} 
+}
